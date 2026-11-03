@@ -1,4 +1,4 @@
-import { pickCupFigure, pickFigure } from './draw.js';
+import { pickCupFigure, pickFigure, pickNumberFigure } from './draw.js';
 
 const STORAGE_KEY = 'setas-settings';
 const FLASH_MS = 150;
@@ -20,11 +20,40 @@ const PALETTE = [
 ];
 
 const ARROWS_TUTORIAL = 'https://www.instagram.com/reel/DcWIYVIhAKV/?dlrf=MXUzZDNlbTRhZjBqZw==';
-const HELP_VIDEOS = {
-  directions: ARROWS_TUTORIAL,
-  colors: ARROWS_TUTORIAL,
-  cup: 'https://www.instagram.com/p/De80lpHvBaX/',
-};
+
+// Cada jogo do menu lateral. Para adicionar um jogo, basta incluir uma entrada aqui.
+const GAMES = [
+  {
+    id: 'directions',
+    name: 'Direita-Esquerda-Pause',
+    help: ARROWS_TUTORIAL,
+    pick: ({ colors }) => pickFigure('directions', colors),
+  },
+  {
+    id: 'colors',
+    name: 'Cores',
+    help: ARROWS_TUTORIAL,
+    usesColors: true,
+    pick: ({ colors }) => pickFigure('colors', colors),
+  },
+  {
+    id: 'cup',
+    name: 'Copo',
+    help: 'https://www.instagram.com/p/De80lpHvBaX/',
+    usesColors: true,
+    usesMaxNumber: true,
+    pick: ({ colors, maxNumber }) => pickCupFigure(colors, maxNumber),
+  },
+  {
+    id: 'finger-numbers',
+    name: 'Números nos dedos',
+    help: 'https://www.instagram.com/reels/DfKvT2yszxC/',
+    flashColor: '#ffffff',
+    pick: () => pickNumberFigure(),
+  },
+];
+
+const gameById = (id) => GAMES.find((game) => game.id === id);
 
 const DEFAULTS = {
   mode: 'directions',
@@ -39,7 +68,9 @@ const form = document.querySelector('#settings-form');
 const settingsScreen = document.querySelector('#settings');
 const game = document.querySelector('#game');
 const countdownNumber = document.querySelector('#countdown-number');
-const cupNumber = document.querySelector('#cup-number');
+const bigNumber = document.querySelector('#big-number');
+const menu = document.querySelector('#menu');
+const gameList = document.querySelector('#game-list');
 
 function loadSettings() {
   try {
@@ -92,16 +123,38 @@ function renderColorOptions(selected) {
   );
 }
 
+function renderMenu() {
+  gameList.append(
+    ...GAMES.map(({ id, name }) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.game = id;
+      button.textContent = name;
+      button.addEventListener('click', () => {
+        form.elements.mode.value = id;
+        refreshForm();
+        window.scrollTo(0, 0);
+        menu.close();
+      });
+      return button;
+    }),
+  );
+}
+
 function refreshForm() {
   const settings = readForm();
-  const usesColors = settings.mode !== 'directions';
-  const missingColor = usesColors && settings.colors.length === 0;
+  const selected = gameById(settings.mode);
+  const missingColor = selected.usesColors && settings.colors.length === 0;
+  document.querySelector('#game-title').textContent = selected.name;
+  document.querySelector('#help-link').href = selected.help;
+  for (const button of gameList.children) {
+    button.setAttribute('aria-current', String(button.dataset.game === selected.id));
+  }
   document.querySelector('#countdown-value').value = formatSeconds(settings.countdown);
   document.querySelector('#figure-value').value = formatSeconds(settings.figureSeconds);
-  document.querySelector('#help-link').href = HELP_VIDEOS[settings.mode];
   document.querySelector('#max-number-value').value = settings.maxNumber;
-  document.querySelector('#max-number-field').hidden = settings.mode !== 'cup';
-  document.querySelector('#colors-field').hidden = !usesColors;
+  document.querySelector('#max-number-field').hidden = !selected.usesMaxNumber;
+  document.querySelector('#colors-field').hidden = !selected.usesColors;
   document.querySelector('#colors-error').hidden = !missingColor;
   document.querySelector('#start').disabled = missingColor;
   saveSettings(settings);
@@ -154,21 +207,26 @@ function showFigure(state, background = '', outlined = false) {
   game.classList.toggle('outlined', outlined);
 }
 
+function writeBigNumber(number, ink) {
+  const text = String(number);
+  bigNumber.textContent = text;
+  bigNumber.dataset.digits = text.length;
+  bigNumber.style.color = ink;
+}
+
 function display(figure) {
+  if (figure.type === 'number') {
+    writeBigNumber(figure.number, '#000000');
+    showFigure('number', '#ffffff');
+    return;
+  }
   if (!figure.color) {
     showFigure(figure.type);
     return;
   }
   const { hex, ink, outlined } = PALETTE.find(({ id }) => id === figure.color);
-  if (figure.type === 'cup') {
-    cupNumber.textContent = figure.number;
-    cupNumber.style.color = ink;
-  }
+  if (figure.type === 'cup') writeBigNumber(figure.number, ink);
   showFigure(figure.type, hex, outlined);
-}
-
-function nextFigure({ mode, colors, maxNumber }) {
-  return mode === 'cup' ? pickCupFigure(colors, maxNumber) : pickFigure(mode, colors);
 }
 
 // Rodada: os horários são absolutos para que atrasos dos timers não se acumulem.
@@ -191,11 +249,11 @@ function runCountdown(remaining, time, settings) {
 }
 
 function runFigure(time, settings, playSound = beepFigure) {
-  display(nextFigure(settings));
+  display(gameById(settings.mode).pick(settings));
   playSound();
   const next = time + settings.figureSeconds * 1000;
   at(next - FLASH_MS, () => {
-    showFigure('flash');
+    showFigure('flash', gameById(settings.mode).flashColor);
     at(next, () => runFigure(next, settings));
   });
 }
@@ -280,12 +338,20 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) stopGame();
 });
 
+document.querySelector('#menu-open').addEventListener('click', () => menu.showModal());
+document.querySelector('#menu-close').addEventListener('click', () => menu.close());
+// O conteúdo do menu cobre todo o painel, então um clique no próprio dialog veio do fundo.
+menu.addEventListener('click', (event) => {
+  if (event.target === menu) menu.close();
+});
+
 form.addEventListener('input', refreshForm);
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   startGame(readForm());
 });
 
+renderMenu();
 fillForm(loadSettings());
 refreshForm();
 

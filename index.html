@@ -17,28 +17,28 @@
   </head>
   <body>
     <main id="settings">
-      <h1>Setas</h1>
+      <header class="topbar">
+        <button
+          type="button"
+          id="menu-open"
+          class="icon-button"
+          aria-label="Abrir menu de jogos"
+          aria-haspopup="dialog"
+          aria-controls="menu"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="2.5" rx="1" />
+            <rect x="3" y="10.75" width="18" height="2.5" rx="1" />
+            <rect x="3" y="16.5" width="18" height="2.5" rx="1" />
+          </svg>
+        </button>
+        <h1 id="game-title"></h1>
+      </header>
+      <a id="help-link" class="help-link" target="_blank" rel="noopener">
+        Como jogar: ver vídeo no Instagram
+      </a>
       <form id="settings-form">
-        <fieldset>
-          <legend>Modo</legend>
-          <div class="modes">
-            <label class="mode">
-              <input type="radio" name="mode" value="directions" />
-              <span>Direita-Esquerda-Pause</span>
-            </label>
-            <label class="mode">
-              <input type="radio" name="mode" value="colors" />
-              <span>Cores</span>
-            </label>
-            <label class="mode">
-              <input type="radio" name="mode" value="cup" />
-              <span>Copo</span>
-            </label>
-          </div>
-          <a id="help-link" class="help-link" target="_blank" rel="noopener">
-            Como jogar: ver vídeo no Instagram
-          </a>
-        </fieldset>
+        <input type="hidden" name="mode" />
 
         <label class="slider">
           <span class="slider-title">Countdown <output id="countdown-value"></output></span>
@@ -75,6 +75,21 @@
       </form>
     </main>
 
+    <dialog id="menu" aria-labelledby="menu-title">
+      <div class="menu-content">
+        <div class="menu-header">
+          <h2 id="menu-title">Jogos</h2>
+          <button type="button" id="menu-close" class="icon-button" aria-label="Fechar menu">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="10.75" y="3" width="2.5" height="18" rx="1" transform="rotate(45 12 12)" />
+              <rect x="10.75" y="3" width="2.5" height="18" rx="1" transform="rotate(-45 12 12)" />
+            </svg>
+          </button>
+        </div>
+        <nav id="game-list" class="game-list"></nav>
+      </div>
+    </dialog>
+
     <div id="game" hidden>
       <div id="countdown">
         <span id="countdown-number"></span>
@@ -87,7 +102,7 @@
         <rect x="22" y="14" width="20" height="72" />
         <rect x="58" y="14" width="20" height="72" />
       </svg>
-      <span id="cup-number"></span>
+      <span id="big-number"></span>
       <div id="hold-bar"></div>
     </div>
   </body>

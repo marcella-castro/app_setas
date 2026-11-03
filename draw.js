@@ -30,6 +30,15 @@ export function pickFigure(mode, colors, random = Math.random) {
   return entries.at(-1).figure;
 }
 
+// Sorteia primeiro a quantidade de casas: um sorteio direto de 1 a 999 daria
+// três casas em 90% das vezes, e números como 2 ou 39 quase nunca apareceriam.
+export function pickNumberFigure(random = Math.random) {
+  const digits = Math.floor(random() * 3) + 1;
+  const smallest = 10 ** (digits - 1);
+  const count = 10 ** digits - smallest;
+  return { type: 'number', number: smallest + Math.floor(random() * count) };
+}
+
 export function pickCupFigure(colors, maxNumber, random = Math.random) {
   return {
     type: 'cup',

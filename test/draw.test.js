@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { pickCupFigure, pickFigure } from '../draw.js';
+import { pickCupFigure, pickFigure, pickNumberFigure } from '../draw.js';
 
 // Percorre todo o intervalo de Math.random em passos iguais, para que as
 // frequências sejam exatas e o teste nunca falhe por azar.
@@ -80,6 +80,32 @@ test('modo copo vai de 1 até o maior número configurado', () => {
   const numbers = Object.keys(cupCounts(['red'], 6)).map((key) => key.split('-')[0]);
   assert.deepEqual(numbers.sort(), ['1', '2', '3', '4', '5', '6']);
 });
+
+test('números nos dedos dá a mesma chance a 1, 2 e 3 casas', () => {
+  const steps = 60;
+  const counts = { 1: 0, 2: 0, 3: 0 };
+  for (let a = 0; a < steps; a++) {
+    for (let b = 0; b < steps; b++) {
+      const rolls = [(a + 0.5) / steps, (b + 0.5) / steps];
+      counts[String(pickNumberFigure(() => rolls.shift()).number).length]++;
+    }
+  }
+  assert.deepEqual(counts, { 1: 1200, 2: 1200, 3: 1200 });
+});
+
+for (const [rolls, number] of [
+  [[0, 0], 1],
+  [[0, 0.999], 9],
+  [[0.5, 0], 10],
+  [[0.5, 0.999], 99],
+  [[0.999, 0], 100],
+  [[0.999, 0.999], 999],
+]) {
+  test(`números nos dedos alcança o limite ${number}`, () => {
+    const pending = [...rolls];
+    assert.deepEqual(pickNumberFigure(() => pending.shift()), { type: 'number', number });
+  });
+}
 
 test('a figura do modo copo informa tipo, número e cor', () => {
   assert.deepEqual(pickCupFigure(['pink'], 3, () => 0), {

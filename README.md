@@ -6,7 +6,9 @@ Site que mostra figuras aleatórias para um jogo de reflexo com blocos.
 
 ## Como jogar
 
-Deite o celular na mesa e espalhe blocos à esquerda e à direita dele. Toque em **Iniciar** e, a cada figura, pegue o bloco certo. Quem pegar primeiro fica com o bloco, e no final cada jogador conta os seus.
+Escolha o jogo no menu lateral, aberto pelo botão no canto superior esquerdo. Cada jogo mostra só as suas próprias configurações e um link para o vídeo com as regras.
+
+Nos jogos Direita-Esquerda-Pause e Cores, deite o celular na mesa e espalhe blocos à esquerda e à direita dele. Toque em **Iniciar** e, a cada figura, pegue o bloco certo. Quem pegar primeiro fica com o bloco, e no final cada jogador conta os seus.
 
 | Figura | O que fazer |
 |---|---|
@@ -24,9 +26,14 @@ Neste modo, a criança joga sozinha, com blocos das cores do jogo e posições n
 
 [Vídeo: como jogar o modo Copo](https://www.instagram.com/p/De80lpHvBaX/)
 
+### Números nos dedos
+
+Cada figura é um número de até 3 casas, de 1 a 999, em preto sobre a tela branca. Números de 1, 2 e 3 casas têm a mesma chance de aparecer. As regras estão no vídeo.
+
+[Vídeo: como jogar Números nos dedos](https://www.instagram.com/reels/DfKvT2yszxC/)
+
 ## Configurações
 
-- **Modo:** Direita-Esquerda-Pause, Cores ou Copo.
 - **Countdown:** de 0 a 10 segundos antes da primeira figura.
 - **Tempo de cada figura:** de 0,5 a 10 segundos.
 - **Maior número:** de 3 a 6, no modo Copo. Os números vão sempre de 1 até esse valor.
@@ -44,7 +51,7 @@ npm test                 # testes do sorteio
 python3 -m http.server   # site em http://localhost:8000
 ```
 
-A lista de cores fica em `PALETTE`, em [app.js](app.js), e as chances de cada figura ficam em [draw.js](draw.js).
+Os jogos do menu ficam em `GAMES` e as cores em `PALETTE`, ambos em [app.js](app.js). As chances de cada figura ficam em [draw.js](draw.js).
 
 ## Publicação
 
