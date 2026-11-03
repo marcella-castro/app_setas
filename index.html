@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Setas</title>
+    <meta name="description" content="Figuras aleatórias para um jogo de reflexo com blocos." />
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Setas" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <main id="settings">
+      <h1>Setas</h1>
+      <form id="settings-form">
+        <fieldset>
+          <legend>Modo</legend>
+          <div class="modes">
+            <label class="mode">
+              <input type="radio" name="mode" value="directions" />
+              <span>Direita-Esquerda-Pause</span>
+            </label>
+            <label class="mode">
+              <input type="radio" name="mode" value="colors" />
+              <span>Cores</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <label class="slider">
+          <span class="slider-title">Countdown <output id="countdown-value"></output></span>
+          <input type="range" name="countdown" min="0" max="10" step="1" />
+        </label>
+
+        <label class="slider">
+          <span class="slider-title">Tempo de cada figura <output id="figure-value"></output></span>
+          <input type="range" name="figureSeconds" min="0.5" max="10" step="0.5" />
+        </label>
+
+        <fieldset id="colors-field">
+          <legend>Cores</legend>
+          <div id="color-list" class="colors"></div>
+          <p id="colors-error" class="error" hidden>Marque pelo menos uma cor para jogar.</p>
+        </fieldset>
+
+        <label class="sound">
+          <span>Som</span>
+          <input type="checkbox" name="sound" />
+        </label>
+
+        <button type="submit" id="start">Iniciar</button>
+        <p class="hint">Durante o jogo, segure a tela por 1 segundo para encerrar.</p>
+        <p id="ios-hint" class="hint" hidden>
+          Para jogar em tela cheia no iPhone, toque em Compartilhar e depois em Adicionar à Tela de
+          Início.
+        </p>
+      </form>
+    </main>
+
+    <div id="game" hidden>
+      <div id="countdown">
+        <span id="countdown-number"></span>
+        <p>Segure a tela por 1 segundo para encerrar</p>
+      </div>
+      <svg id="arrow" viewBox="0 0 100 100" aria-hidden="true">
+        <polygon points="8,38 52,38 52,14 92,50 52,86 52,62 8,62" />
+      </svg>
+      <svg id="pause" viewBox="0 0 100 100" aria-hidden="true">
+        <rect x="22" y="14" width="20" height="72" />
+        <rect x="58" y="14" width="20" height="72" />
+      </svg>
+      <div id="hold-bar"></div>
+    </div>
+  </body>
+</html>
