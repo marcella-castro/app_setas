@@ -19,6 +19,13 @@ const PALETTE = [
   { id: 'gray', name: 'Cinza', hex: '#9e9e9e', ink: '#000000' },
 ];
 
+const ARROWS_TUTORIAL = 'https://www.instagram.com/reel/DcWIYVIhAKV/?dlrf=MXUzZDNlbTRhZjBqZw==';
+const HELP_VIDEOS = {
+  directions: ARROWS_TUTORIAL,
+  colors: ARROWS_TUTORIAL,
+  cup: 'https://www.instagram.com/p/De80lpHvBaX/',
+};
+
 const DEFAULTS = {
   mode: 'directions',
   countdown: 3,
@@ -91,6 +98,7 @@ function refreshForm() {
   const missingColor = usesColors && settings.colors.length === 0;
   document.querySelector('#countdown-value').value = formatSeconds(settings.countdown);
   document.querySelector('#figure-value').value = formatSeconds(settings.figureSeconds);
+  document.querySelector('#help-link').href = HELP_VIDEOS[settings.mode];
   document.querySelector('#max-number-value').value = settings.maxNumber;
   document.querySelector('#max-number-field').hidden = settings.mode !== 'cup';
   document.querySelector('#colors-field').hidden = !usesColors;
