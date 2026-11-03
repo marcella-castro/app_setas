@@ -16,12 +16,17 @@ Deite o celular na mesa e espalhe blocos à esquerda e à direita dele. Toque em
 
 Para encerrar, segure o dedo na tela por 1 segundo.
 
+### Modo Copo
+
+Neste modo, a criança joga sozinha, com blocos das cores do jogo e posições numeradas de 1 até o maior número configurado. Cada figura é um número com uma cor de fundo: a criança leva o bloco daquela cor até a posição daquele número. Se aparecer 1 em amarelo, ela leva o bloco amarelo até o 1. Se depois aparecer 1 em verde, ela troca e coloca o verde. Não há setas, pause nem pontos.
+
 ## Configurações
 
-- **Modo:** Direita-Esquerda-Pause ou Cores.
+- **Modo:** Direita-Esquerda-Pause, Cores ou Copo.
 - **Countdown:** de 0 a 10 segundos antes da primeira figura.
 - **Tempo de cada figura:** de 0,5 a 10 segundos.
-- **Cores:** quais das 9 cores entram no modo Cores.
+- **Maior número:** de 3 a 6, no modo Copo. Os números vão sempre de 1 até esse valor.
+- **Cores:** quais das 9 cores entram nos modos Cores e Copo. A seleção é a mesma nos dois.
 - **Som:** bipe no countdown e a cada figura. O bipe é igual para todas as figuras.
 
 Os valores ficam salvos no celular.

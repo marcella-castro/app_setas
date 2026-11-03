@@ -30,6 +30,10 @@
               <input type="radio" name="mode" value="colors" />
               <span>Cores</span>
             </label>
+            <label class="mode">
+              <input type="radio" name="mode" value="cup" />
+              <span>Copo</span>
+            </label>
           </div>
         </fieldset>
 
@@ -41,6 +45,11 @@
         <label class="slider">
           <span class="slider-title">Tempo de cada figura <output id="figure-value"></output></span>
           <input type="range" name="figureSeconds" min="0.5" max="10" step="0.5" />
+        </label>
+
+        <label class="slider" id="max-number-field">
+          <span class="slider-title">Maior número <output id="max-number-value"></output></span>
+          <input type="range" name="maxNumber" min="3" max="6" step="1" />
         </label>
 
         <fieldset id="colors-field">
@@ -75,6 +84,7 @@
         <rect x="22" y="14" width="20" height="72" />
         <rect x="58" y="14" width="20" height="72" />
       </svg>
+      <span id="cup-number"></span>
       <div id="hold-bar"></div>
     </div>
   </body>

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { pickFigure } from '../draw.js';
+import { pickCupFigure, pickFigure } from '../draw.js';
 
 // Percorre todo o intervalo de Math.random em passos iguais, para que as
 // frequências sejam exatas e o teste nunca falhe por azar.
@@ -48,4 +48,43 @@ test('a figura de cor informa qual cor foi sorteada', () => {
 
 test('sem gerador informado, usa Math.random e devolve uma figura válida', () => {
   assert.ok(['left', 'right', 'pause'].includes(pickFigure('directions', []).type));
+});
+
+// Percorre todas as combinações de dois sorteios em passos iguais.
+function cupCounts(colors, maxNumber) {
+  const steps = 60;
+  const counts = {};
+  for (let a = 0; a < steps; a++) {
+    for (let b = 0; b < steps; b++) {
+      const rolls = [(a + 0.5) / steps, (b + 0.5) / steps];
+      const figure = pickCupFigure(colors, maxNumber, () => rolls.shift());
+      const key = `${figure.number}-${figure.color}`;
+      counts[key] = (counts[key] ?? 0) + 1;
+    }
+  }
+  return counts;
+}
+
+test('modo copo sorteia número e cor de forma independente e com chances iguais', () => {
+  assert.deepEqual(cupCounts(['red', 'blue'], 3), {
+    '1-red': 600,
+    '1-blue': 600,
+    '2-red': 600,
+    '2-blue': 600,
+    '3-red': 600,
+    '3-blue': 600,
+  });
+});
+
+test('modo copo vai de 1 até o maior número configurado', () => {
+  const numbers = Object.keys(cupCounts(['red'], 6)).map((key) => key.split('-')[0]);
+  assert.deepEqual(numbers.sort(), ['1', '2', '3', '4', '5', '6']);
+});
+
+test('a figura do modo copo informa tipo, número e cor', () => {
+  assert.deepEqual(pickCupFigure(['pink'], 3, () => 0), {
+    type: 'cup',
+    number: 1,
+    color: 'pink',
+  });
 });

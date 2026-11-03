@@ -66,6 +66,10 @@ legend {
   gap: 8px;
 }
 
+.mode:first-child {
+  grid-column: 1 / -1;
+}
+
 .mode span {
   display: grid;
   place-items: center;
@@ -218,7 +222,8 @@ input[type='range'] {
 
 #countdown,
 #arrow,
-#pause {
+#pause,
+#cup-number {
   display: none;
 }
 
@@ -237,8 +242,15 @@ input[type='range'] {
 
 #game[data-figure='left'] #arrow,
 #game[data-figure='right'] #arrow,
-#game[data-figure='pause'] #pause {
+#game[data-figure='pause'] #pause,
+#game[data-figure='cup'] #cup-number {
   display: block;
+}
+
+#cup-number {
+  font-size: min(130vw, 95dvh);
+  font-weight: 700;
+  line-height: 1;
 }
 
 #game[data-figure='left'] #arrow {

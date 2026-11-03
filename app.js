@@ -1,21 +1,22 @@
-import { pickFigure } from './draw.js';
+import { pickCupFigure, pickFigure } from './draw.js';
 
 const STORAGE_KEY = 'setas-settings';
 const FLASH_MS = 150;
 const HOLD_TO_EXIT_MS = 1000;
 const RELEASE_GRACE_MS = 100;
 
+// ink é a cor do número no modo Copo, escolhida para contrastar com o fundo.
 const PALETTE = [
-  { id: 'red', name: 'Vermelho', hex: '#e53935' },
-  { id: 'blue', name: 'Azul', hex: '#1e88e5' },
-  { id: 'green', name: 'Verde', hex: '#43a047' },
-  { id: 'yellow', name: 'Amarelo', hex: '#fdd835' },
-  { id: 'orange', name: 'Laranja', hex: '#fb8c00' },
-  { id: 'pink', name: 'Rosa', hex: '#f48fb1' },
-  { id: 'brown', name: 'Marrom', hex: '#6d4c41' },
+  { id: 'red', name: 'Vermelho', hex: '#e53935', ink: '#ffffff' },
+  { id: 'blue', name: 'Azul', hex: '#1e88e5', ink: '#ffffff' },
+  { id: 'green', name: 'Verde', hex: '#43a047', ink: '#ffffff' },
+  { id: 'yellow', name: 'Amarelo', hex: '#fdd835', ink: '#000000' },
+  { id: 'orange', name: 'Laranja', hex: '#fb8c00', ink: '#000000' },
+  { id: 'pink', name: 'Rosa', hex: '#f48fb1', ink: '#000000' },
+  { id: 'brown', name: 'Marrom', hex: '#6d4c41', ink: '#ffffff' },
   // A borda branca diferencia o preto do flash entre as figuras.
-  { id: 'black', name: 'Preto', hex: '#000000', outlined: true },
-  { id: 'gray', name: 'Cinza', hex: '#9e9e9e' },
+  { id: 'black', name: 'Preto', hex: '#000000', ink: '#ffffff', outlined: true },
+  { id: 'gray', name: 'Cinza', hex: '#9e9e9e', ink: '#000000' },
 ];
 
 const DEFAULTS = {
@@ -23,6 +24,7 @@ const DEFAULTS = {
   countdown: 3,
   figureSeconds: 2,
   colors: ['red', 'blue', 'green', 'yellow'],
+  maxNumber: 3,
   sound: true,
 };
 
@@ -30,6 +32,7 @@ const form = document.querySelector('#settings-form');
 const settingsScreen = document.querySelector('#settings');
 const game = document.querySelector('#game');
 const countdownNumber = document.querySelector('#countdown-number');
+const cupNumber = document.querySelector('#cup-number');
 
 function loadSettings() {
   try {
@@ -53,6 +56,7 @@ function readForm() {
     countdown: Number(form.elements.countdown.value),
     figureSeconds: Number(form.elements.figureSeconds.value),
     colors: [...form.querySelectorAll('[name="color"]:checked')].map((input) => input.value),
+    maxNumber: Number(form.elements.maxNumber.value),
     sound: form.elements.sound.checked,
   };
 }
@@ -83,10 +87,13 @@ function renderColorOptions(selected) {
 
 function refreshForm() {
   const settings = readForm();
-  const missingColor = settings.mode === 'colors' && settings.colors.length === 0;
+  const usesColors = settings.mode !== 'directions';
+  const missingColor = usesColors && settings.colors.length === 0;
   document.querySelector('#countdown-value').value = formatSeconds(settings.countdown);
   document.querySelector('#figure-value').value = formatSeconds(settings.figureSeconds);
-  document.querySelector('#colors-field').hidden = settings.mode !== 'colors';
+  document.querySelector('#max-number-value').value = settings.maxNumber;
+  document.querySelector('#max-number-field').hidden = settings.mode !== 'cup';
+  document.querySelector('#colors-field').hidden = !usesColors;
   document.querySelector('#colors-error').hidden = !missingColor;
   document.querySelector('#start').disabled = missingColor;
   saveSettings(settings);
@@ -96,6 +103,7 @@ function fillForm(settings) {
   form.elements.mode.value = settings.mode;
   form.elements.countdown.value = settings.countdown;
   form.elements.figureSeconds.value = settings.figureSeconds;
+  form.elements.maxNumber.value = settings.maxNumber;
   form.elements.sound.checked = settings.sound;
   renderColorOptions(settings.colors);
 }
@@ -139,12 +147,20 @@ function showFigure(state, background = '', outlined = false) {
 }
 
 function display(figure) {
-  if (figure.type !== 'color') {
+  if (!figure.color) {
     showFigure(figure.type);
     return;
   }
-  const { hex, outlined } = PALETTE.find(({ id }) => id === figure.color);
-  showFigure('color', hex, outlined);
+  const { hex, ink, outlined } = PALETTE.find(({ id }) => id === figure.color);
+  if (figure.type === 'cup') {
+    cupNumber.textContent = figure.number;
+    cupNumber.style.color = ink;
+  }
+  showFigure(figure.type, hex, outlined);
+}
+
+function nextFigure({ mode, colors, maxNumber }) {
+  return mode === 'cup' ? pickCupFigure(colors, maxNumber) : pickFigure(mode, colors);
 }
 
 // Rodada: os horários são absolutos para que atrasos dos timers não se acumulem.
@@ -167,7 +183,7 @@ function runCountdown(remaining, time, settings) {
 }
 
 function runFigure(time, settings, playSound = beepFigure) {
-  display(pickFigure(settings.mode, settings.colors));
+  display(nextFigure(settings));
   playSound();
   const next = time + settings.figureSeconds * 1000;
   at(next - FLASH_MS, () => {

@@ -29,3 +29,11 @@ export function pickFigure(mode, colors, random = Math.random) {
   // Arredondamento de ponto flutuante pode deixar sobrar uma fração mínima.
   return entries.at(-1).figure;
 }
+
+export function pickCupFigure(colors, maxNumber, random = Math.random) {
+  return {
+    type: 'cup',
+    number: Math.floor(random() * maxNumber) + 1,
+    color: colors[Math.floor(random() * colors.length)],
+  };
+}
