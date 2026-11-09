@@ -34,7 +34,7 @@ Cada figura é um número de até 3 casas, de 1 a 999, em preto sobre a tela bra
 
 ### Arrume os lápis
 
-A criança tem 4 lápis de cores diferentes. Cada figura mostra 4 lápis desenhados em tela branca, em um arranjo compacto (lado a lado, quadrado, L, T, zigue-zague, `<>` ou Y): a criança arruma os lápis de verdade do mesmo jeito. Lado a lado, no L e no Y os lápis formam a letra; no `<>` formam as duas pontas; no quadrado, no T e no zigue-zague todos apontam para o centro. O mesmo arranjo não aparece duas vezes seguidas.
+A criança tem 4 lápis de cores diferentes. Cada figura mostra 4 lápis desenhados em tela branca, em um arranjo compacto (lado a lado, quadrado, L, T, zigue-zague, `<>` ou Y): a criança arruma os lápis de verdade do mesmo jeito. Lado a lado, no L e no Y os lápis formam a letra; no `<>` formam as duas pontas; no quadrado cada lápis é um lado; no T e no zigue-zague todos apontam para o centro. O mesmo arranjo não aparece duas vezes seguidas.
 
 [Vídeo: como jogar Arrume os lápis](https://www.instagram.com/reel/DePhTpzNbrz/?utm_source=ig_web_copy_link&srtk=NTc4MTIwNjQ2YQ==)
 

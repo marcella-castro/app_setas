@@ -53,7 +53,18 @@ export function pickCupFigure(colors, maxNumber, random = Math.random) {
 // o giro em graus de um lápis de ponta para cima e as posições podem ser fracionárias.
 const PENCIL_LAYOUTS = [
   { id: 'line', rows: ['####'], upright: true },
-  { id: 'square', rows: ['##', '##'] },
+  // Quadrado: cada lápis é um lado, em sentido horário.
+  {
+    id: 'square',
+    cols: 2.12,
+    rowCount: 2.12,
+    slots: [
+      { x: 0.56, y: 0, angle: 90 },
+      { x: 1.12, y: 0.56, angle: 180 },
+      { x: 0.56, y: 1.12, angle: 270 },
+      { x: 0, y: 0.56, angle: 0 },
+    ],
+  },
   { id: 't', rows: ['###', '.#.'] },
   { id: 'zigzag', rows: ['##.', '.##'] },
   // L: 3 lápis em pé e 1 deitado no pé.
