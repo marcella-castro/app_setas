@@ -135,8 +135,8 @@ test('lápis: todos os arranjos podem sair e nenhum repete o anterior', () => {
         (_, i) => pickPencilsFigure(FOUR, previous, () => (i + 0.5) / 100).layout,
       ),
     );
-  assert.equal(layouts(undefined).size, 5);
-  assert.equal(layouts('t').size, 4);
+  assert.equal(layouts(undefined).size, 7);
+  assert.equal(layouts('t').size, 6);
   assert.ok(!layouts('t').has('t'));
 });
 
@@ -157,6 +157,17 @@ test('lápis: nos outros arranjos todos apontam para o centro', () => {
   const angles = (layout) => find(layout).cells.map(({ x, y, angle }) => `${x},${y}:${angle}`).sort();
   // Em um quadrado 2×2 cada lápis aponta na diagonal para o meio.
   assert.deepEqual(angles('square'), ['0,0:135', '0,1:45', '1,0:-135', '1,1:-45'].sort());
-  // Em um L, o lápis do canto aponta na diagonal e os das pontas apontam para dentro.
-  assert.equal(find('l').cells.length, 4);
+});
+
+test('lápis: L, <> e Y usam posições e ângulos fixos', () => {
+  const find = (layout) => {
+    for (let i = 0; i < 100; i++) {
+      const figure = pickPencilsFigure(FOUR, undefined, () => (i + 0.5) / 100);
+      if (figure.layout === layout) return figure;
+    }
+  };
+  const angles = (layout) => find(layout).cells.map(({ angle }) => angle).sort((a, b) => a - b);
+  assert.deepEqual(angles('l'), [0, 0, 0, 90]);
+  assert.deepEqual(angles('angles'), [45, 135, 225, 315]);
+  assert.deepEqual(angles('y'), [0, 0, 135, 225]);
 });

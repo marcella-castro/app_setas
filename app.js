@@ -267,8 +267,10 @@ function displayPencils({ cols, rows, cells }) {
       .filter(({ color }) => color)
       .map(({ x, y, color, angle }) => {
         const cell = pencilCell(color, angle);
-        cell.style.gridColumn = x + 1;
-        cell.style.gridRow = y + 1;
+        cell.style.left = `${(x / cols) * 100}%`;
+        cell.style.top = `${(y / rows) * 100}%`;
+        cell.style.width = `${100 / cols}%`;
+        cell.style.height = `${100 / rows}%`;
         return cell;
       }),
   );

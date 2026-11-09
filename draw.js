@@ -47,22 +47,59 @@ export function pickCupFigure(colors, maxNumber, random = Math.random) {
   };
 }
 
-// Arranjos do jogo Arrume os lápis: cada # é a posição de um dos 4 lápis. Os arranjos
-// são compactos; só a linha deixa os lápis em pé, nos outros todos apontam para o centro.
+// Arranjos do jogo Arrume os lápis, sempre com 4 lápis. Um arranjo pode vir de uma
+// grade (# é uma posição; nela, só a linha deixa os lápis em pé e nos outros todos
+// apontam para o centro) ou de posições e ângulos definidos à mão, em que o ângulo é
+// o giro em graus de um lápis de ponta para cima e as posições podem ser fracionárias.
 const PENCIL_LAYOUTS = [
   { id: 'line', rows: ['####'], upright: true },
   { id: 'square', rows: ['##', '##'] },
-  { id: 'l', rows: ['#.', '#.', '##'] },
   { id: 't', rows: ['###', '.#.'] },
   { id: 'zigzag', rows: ['##.', '.##'] },
-].map(({ id, rows, upright = false }) => ({
+  // L: 3 lápis em pé e 1 deitado no pé.
+  {
+    id: 'l',
+    cols: 1.75,
+    rowCount: 3,
+    slots: [
+      { x: 0, y: 0, angle: 0 },
+      { x: 0, y: 1, angle: 0 },
+      { x: 0, y: 2, angle: 0 },
+      { x: 0.75, y: 2, angle: 90 },
+    ],
+  },
+  // <>: duas pontas de lápis formam o "<" e as outras duas o ">".
+  {
+    id: 'angles',
+    cols: 2,
+    rowCount: 1.7,
+    slots: [
+      { x: 0, y: 0, angle: 225 },
+      { x: 0, y: 0.7, angle: 315 },
+      { x: 1, y: 0, angle: 135 },
+      { x: 1, y: 0.7, angle: 45 },
+    ],
+  },
+  // Y: dois lápis inclinados se encontram em cima de dois lápis em pé.
+  {
+    id: 'y',
+    cols: 2,
+    rowCount: 3,
+    slots: [
+      { x: 0, y: 0.25, angle: 135 },
+      { x: 1, y: 0.25, angle: 225 },
+      { x: 0.5, y: 1, angle: 0 },
+      { x: 0.5, y: 2, angle: 0 },
+    ],
+  },
+].map(({ id, rows, upright = false, cols, rowCount, slots }) => ({
   id,
   upright,
-  cols: rows[0].length,
-  rowCount: rows.length,
-  slots: rows.flatMap((row, y) =>
-    [...row].flatMap((char, x) => (char === '#' ? [{ x, y }] : [])),
-  ),
+  cols: cols ?? rows[0].length,
+  rowCount: rowCount ?? rows.length,
+  slots:
+    slots ??
+    rows.flatMap((row, y) => [...row].flatMap((char, x) => (char === '#' ? [{ x, y }] : []))),
 }));
 
 export const PENCIL_COUNT = 4;
@@ -88,7 +125,7 @@ export function pickPencilsFigure(colors, previousLayout, random = Math.random) 
   const cells = layout.slots.map((slot, index) => ({
     ...slot,
     color: shuffled[index],
-    angle: layout.upright ? 0 : angleToward(slot, cx, cy),
+    angle: slot.angle ?? (layout.upright ? 0 : angleToward(slot, cx, cy)),
   }));
   return { type: 'pencils', layout: layout.id, cols: layout.cols, rows: layout.rowCount, cells };
 }
