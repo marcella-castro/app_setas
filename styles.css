@@ -244,6 +244,10 @@ input[type='range'] {
   color: var(--muted);
 }
 
+.color input:disabled + span {
+  opacity: 0.4;
+}
+
 .error {
   margin: 8px 0 0;
   color: var(--error);
@@ -309,6 +313,7 @@ input[type='range'] {
 #countdown,
 #arrow,
 #pause,
+#pencils,
 #big-number {
   display: none;
 }
@@ -329,9 +334,27 @@ input[type='range'] {
 #game[data-figure='left'] #arrow,
 #game[data-figure='right'] #arrow,
 #game[data-figure='pause'] #pause,
+#game[data-figure='pencils'] #pencils,
 #game[data-figure='cup'] #big-number,
 #game[data-figure='number'] #big-number {
   display: block;
+}
+
+#pencils {
+  gap: 2%;
+  width: min(92vw, calc(92dvh * var(--cols) / var(--rows)));
+  aspect-ratio: var(--cols) / var(--rows);
+}
+
+#game[data-figure='pencils'] #pencils {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
+}
+
+#pencils svg {
+  width: 100%;
+  height: 100%;
 }
 
 #big-number {

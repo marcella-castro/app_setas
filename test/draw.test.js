@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { pickCupFigure, pickFigure, pickNumberFigure } from '../draw.js';
+import { pickCupFigure, pickFigure, pickNumberFigure, pickPencilsFigure } from '../draw.js';
 
 // Percorre todo o intervalo de Math.random em passos iguais, para que as
 // frequências sejam exatas e o teste nunca falhe por azar.
@@ -113,4 +113,39 @@ test('a figura do modo copo informa tipo, número e cor', () => {
     number: 1,
     color: 'pink',
   });
+});
+
+const FOUR = ['red', 'blue', 'green', 'yellow'];
+
+test('lápis: cada cor aparece uma vez, em posições diferentes do arranjo', () => {
+  for (let i = 0; i < 200; i++) {
+    let n = i;
+    const figure = pickPencilsFigure(FOUR, undefined, () => ((n += 37) % 200) / 200);
+    const colored = figure.cells.filter((cell) => cell.color).map((cell) => cell.color);
+    assert.deepEqual([...colored].sort(), [...FOUR].sort());
+    assert.ok(figure.cells.length >= 4);
+    const positions = new Set(figure.cells.map(({ x, y }) => `${x},${y}`));
+    assert.equal(positions.size, figure.cells.length);
+  }
+});
+
+test('lápis: todos os arranjos podem sair e nenhum repete o anterior', () => {
+  const seen = new Set();
+  for (let i = 0; i < 100; i++) {
+    const figure = pickPencilsFigure(FOUR, 'x', () => (i + 0.5) / 100);
+    assert.notEqual(figure.layout, 'x');
+    seen.add(figure.layout);
+  }
+  assert.equal(seen.size, 7);
+  assert.equal(
+    new Set(Array.from({ length: 100 }, (_, i) => pickPencilsFigure(FOUR, undefined, () => (i + 0.5) / 100).layout)).size,
+    8,
+  );
+});
+
+test('lápis: arranjos de 4 posições ficam totalmente preenchidos', () => {
+  for (let i = 0; i < 100; i++) {
+    const figure = pickPencilsFigure(FOUR, undefined, () => (i + 0.5) / 100);
+    if (figure.cells.length === 4) assert.ok(figure.cells.every((cell) => cell.color));
+  }
 });

@@ -32,12 +32,19 @@ Cada figura é um número de até 3 casas, de 1 a 999, em preto sobre a tela bra
 
 [Vídeo: como jogar Números nos dedos](https://www.instagram.com/reels/DfKvT2yszxC/)
 
+### Arrume os lápis
+
+A criança tem 4 lápis de cores diferentes. Cada figura é um arranjo de ☒ (linha, quadrado, X, M, L, T, escada ou +) com os lápis em posições sorteadas: ela arruma os lápis de verdade do mesmo jeito. Quando o arranjo tem mais de 4 posições, as que sobram ficam vazias, só com contorno. O mesmo arranjo não aparece duas vezes seguidas.
+
+[Vídeo: como jogar Arrume os lápis](https://www.instagram.com/reel/DePhTpzNbrz/?utm_source=ig_web_copy_link&srtk=NTc4MTIwNjQ2YQ==)
+
 ## Configurações
 
 - **Countdown:** de 0 a 10 segundos antes da primeira figura.
 - **Tempo de cada figura:** de 0,5 a 10 segundos.
 - **Maior número:** de 3 a 6, no modo Copo. Os números vão sempre de 1 até esse valor.
 - **Cores:** quais das 9 cores entram nos modos Cores e Copo. A seleção é a mesma nos dois.
+- **Cores dos lápis:** no modo Arrume os lápis, exatamente 4 das 9 cores, as dos lápis que você tem. A seleção é própria desse modo.
 - **Som:** bipe no countdown e a cada figura. O bipe é igual para todas as figuras.
 
 Os valores ficam salvos no celular.

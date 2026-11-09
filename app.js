@@ -1,4 +1,10 @@
-import { pickCupFigure, pickFigure, pickNumberFigure } from './draw.js';
+import {
+  PENCIL_COUNT,
+  pickCupFigure,
+  pickFigure,
+  pickNumberFigure,
+  pickPencilsFigure,
+} from './draw.js';
 
 const STORAGE_KEY = 'setas-settings';
 const FLASH_MS = 150;
@@ -51,6 +57,13 @@ const GAMES = [
     flashColor: '#ffffff',
     pick: () => pickNumberFigure(),
   },
+  {
+    id: 'pencils',
+    name: 'Arrume os lápis',
+    help: 'https://www.instagram.com/reel/DePhTpzNbrz/?utm_source=ig_web_copy_link&srtk=NTc4MTIwNjQ2YQ==',
+    usesPencilColors: true,
+    pick: ({ pencilColors }, previous) => pickPencilsFigure(pencilColors, previous?.layout),
+  },
 ];
 
 const gameById = (id) => GAMES.find((game) => game.id === id);
@@ -60,6 +73,7 @@ const DEFAULTS = {
   countdown: 3,
   figureSeconds: 2,
   colors: ['red', 'blue', 'green', 'yellow'],
+  pencilColors: ['red', 'blue', 'green', 'yellow'],
   maxNumber: 3,
   sound: true,
 };
@@ -94,6 +108,9 @@ function readForm() {
     countdown: Number(form.elements.countdown.value),
     figureSeconds: Number(form.elements.figureSeconds.value),
     colors: [...form.querySelectorAll('[name="color"]:checked')].map((input) => input.value),
+    pencilColors: [...form.querySelectorAll('[name="pencilColor"]:checked')].map(
+      (input) => input.value,
+    ),
     maxNumber: Number(form.elements.maxNumber.value),
     sound: form.elements.sound.checked,
   };
@@ -103,14 +120,14 @@ function formatSeconds(value) {
   return `${value.toLocaleString('pt-BR')} s`;
 }
 
-function renderColorOptions(selected) {
-  document.querySelector('#color-list').append(
+function renderColorOptions(list, field, selected) {
+  document.querySelector(list).append(
     ...PALETTE.map(({ id, name, hex }) => {
       const label = document.createElement('label');
       label.className = 'color';
       const input = document.createElement('input');
       input.type = 'checkbox';
-      input.name = 'color';
+      input.name = field;
       input.value = id;
       input.checked = selected.includes(id);
       const content = document.createElement('span');
@@ -145,6 +162,11 @@ function refreshForm() {
   const settings = readForm();
   const selected = gameById(settings.mode);
   const missingColor = selected.usesColors && settings.colors.length === 0;
+  const wrongPencils = selected.usesPencilColors && settings.pencilColors.length !== PENCIL_COUNT;
+  const pencilsFull = settings.pencilColors.length >= PENCIL_COUNT;
+  for (const input of form.querySelectorAll('[name="pencilColor"]')) {
+    input.disabled = pencilsFull && !input.checked;
+  }
   document.querySelector('#game-title').textContent = selected.name;
   document.querySelector('#help-link').href = selected.help;
   for (const button of gameList.children) {
@@ -156,7 +178,9 @@ function refreshForm() {
   document.querySelector('#max-number-field').hidden = !selected.usesMaxNumber;
   document.querySelector('#colors-field').hidden = !selected.usesColors;
   document.querySelector('#colors-error').hidden = !missingColor;
-  document.querySelector('#start').disabled = missingColor;
+  document.querySelector('#pencil-colors-field').hidden = !selected.usesPencilColors;
+  document.querySelector('#pencil-colors-error').hidden = !wrongPencils;
+  document.querySelector('#start').disabled = missingColor || wrongPencils;
   saveSettings(settings);
 }
 
@@ -166,7 +190,8 @@ function fillForm(settings) {
   form.elements.figureSeconds.value = settings.figureSeconds;
   form.elements.maxNumber.value = settings.maxNumber;
   form.elements.sound.checked = settings.sound;
-  renderColorOptions(settings.colors);
+  renderColorOptions('#color-list', 'color', settings.colors);
+  renderColorOptions('#pencil-color-list', 'pencilColor', settings.pencilColors);
 }
 
 // Som
@@ -214,7 +239,42 @@ function writeBigNumber(number, ink) {
   bigNumber.style.color = ink;
 }
 
+const SVG = 'http://www.w3.org/2000/svg';
+
+// Um ☒: quadrado com X. Lápis levam a cor dele; posições vazias, só o contorno cinza.
+function pencilCell(color) {
+  const pencil = color && PALETTE.find(({ id }) => id === color);
+  const fill = pencil ? pencil.hex : 'none';
+  const line = pencil ? pencil.ink : '#666';
+  const edge = pencil ? (pencil.outlined ? '#fff' : pencil.hex) : '#666';
+  const svg = document.createElementNS(SVG, 'svg');
+  svg.setAttribute('viewBox', '0 0 100 100');
+  svg.innerHTML =
+    `<rect x="4" y="4" width="92" height="92" rx="6" fill="${fill}" stroke="${edge}" stroke-width="4"/>` +
+    `<path d="M20 20L80 80M80 20L20 80" stroke="${line}" stroke-width="8" stroke-linecap="round"/>`;
+  return svg;
+}
+
+function displayPencils({ cols, rows, cells }) {
+  const board = document.querySelector('#pencils');
+  board.style.setProperty('--cols', cols);
+  board.style.setProperty('--rows', rows);
+  board.replaceChildren(
+    ...cells.map(({ x, y, color }) => {
+      const cell = pencilCell(color);
+      cell.style.gridColumn = x + 1;
+      cell.style.gridRow = y + 1;
+      return cell;
+    }),
+  );
+  showFigure('pencils');
+}
+
 function display(figure) {
+  if (figure.type === 'pencils') {
+    displayPencils(figure);
+    return;
+  }
   if (figure.type === 'number') {
     writeBigNumber(figure.number, '#000000');
     showFigure('number', '#ffffff');
@@ -248,8 +308,11 @@ function runCountdown(remaining, time, settings) {
   at(time + 1000, () => runCountdown(remaining - 1, time + 1000, settings));
 }
 
+let lastFigure;
+
 function runFigure(time, settings, playSound = beepFigure) {
-  display(gameById(settings.mode).pick(settings));
+  lastFigure = gameById(settings.mode).pick(settings, lastFigure);
+  display(lastFigure);
   playSound();
   const next = time + settings.figureSeconds * 1000;
   at(next - FLASH_MS, () => {
@@ -279,6 +342,7 @@ function enterFullscreen() {
 function startGame(settings) {
   settingsScreen.hidden = true;
   game.hidden = false;
+  lastFigure = undefined;
   prepareSound(settings.sound);
   enterFullscreen();
   keepScreenOn();
