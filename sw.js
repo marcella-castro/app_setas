@@ -1,4 +1,4 @@
-const CACHE = 'setas-v2';
+const CACHE = 'setas-v3';
 const FILES = [
   './',
   'index.html',
@@ -21,7 +21,13 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  // Apaga os caches de versões anteriores para não servir arquivos velhos.
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim()),
+  );
 });
 
 // Responde na hora com o que está salvo e atualiza em segundo plano,
