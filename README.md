@@ -40,7 +40,7 @@ A criança tem 4 lápis de cores diferentes. Cada figura mostra 4 lápis desenha
 
 ### Número e Fichas
 
-A tela mostra um número de 1 a 10 dentro de um círculo e, ao lado, uma bolinha de uma cor. Na vida real, a criança coloca uma ficha daquela cor na caixinha daquele número. São 5 figuras por rodada, com números diferentes. Depois da última aparece o gabarito, com as caixinhas de 1 a 10 e as fichas nos lugares certos, para a criança conferir. Segure a tela por 1 segundo para encerrar.
+A tela mostra um número de 1 a 10 dentro de um círculo e, ao lado, uma bolinha de uma cor. Na vida real, a criança coloca uma ficha daquela cor na caixinha daquele número. São 5 figuras por rodada, com números diferentes. Depois da última aparece o gabarito, com as caixinhas de 1 a 10 e as fichas nos lugares certos, para a criança conferir. O botão **Próxima rodada**, no gabarito, começa outra rodada com novos números. Segure a tela por 1 segundo para encerrar.
 
 [Vídeo: como jogar Número e Fichas](https://www.instagram.com/reel/DeFOSgGNvVG/)
 

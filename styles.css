@@ -413,6 +413,19 @@ input[type='range'] {
   width: 100%;
 }
 
+#next-round {
+  min-height: 56px;
+  padding: 0 32px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .answer-card {
   position: relative;
   display: grid;

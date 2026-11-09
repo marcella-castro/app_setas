@@ -417,16 +417,26 @@ function enterFullscreen() {
   document.documentElement.requestFullscreen?.().catch(() => {});
 }
 
-function startGame(settings) {
-  settingsScreen.hidden = true;
-  game.hidden = false;
+let currentSettings;
+
+function startRound(settings) {
+  clearTimeout(timer);
   lastFigure = undefined;
   round = undefined;
   roundIndex = 0;
+  runCountdown(settings.countdown, performance.now(), settings);
+}
+
+document.querySelector('#next-round').addEventListener('click', () => startRound(currentSettings));
+
+function startGame(settings) {
+  currentSettings = settings;
+  settingsScreen.hidden = true;
+  game.hidden = false;
   prepareSound(settings.sound);
   enterFullscreen();
   keepScreenOn();
-  runCountdown(settings.countdown, performance.now(), settings);
+  startRound(settings);
 }
 
 function stopGame() {
