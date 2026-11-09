@@ -135,8 +135,8 @@ test('lápis: todos os arranjos podem sair e nenhum repete o anterior', () => {
         (_, i) => pickPencilsFigure(FOUR, previous, () => (i + 0.5) / 100).layout,
       ),
     );
-  assert.equal(layouts(undefined).size, 7);
-  assert.equal(layouts('t').size, 6);
+  assert.equal(layouts(undefined).size, 8);
+  assert.equal(layouts('t').size, 7);
   assert.ok(!layouts('t').has('t'));
 });
 
@@ -171,4 +171,13 @@ test('lápis: quadrado, L, <> e Y usam posições e ângulos fixos', () => {
   assert.deepEqual(angles('l'), [0, 0, 0, 90]);
   assert.deepEqual(angles('angles'), [45, 135, 225, 315]);
   assert.deepEqual(angles('y'), [0, 0, 135, 225]);
+});
+
+test('lápis: o X aponta os 4 lápis na diagonal para o centro', () => {
+  for (let i = 0; i < 100; i++) {
+    const figure = pickPencilsFigure(FOUR, undefined, () => (i + 0.5) / 100);
+    if (figure.layout === 'x') {
+      assert.deepEqual(figure.cells.map(({ angle }) => angle).sort((a, b) => a - b), [-135, -45, 45, 135]);
+    }
+  }
 });
