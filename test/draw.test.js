@@ -117,40 +117,46 @@ test('a figura do modo copo informa tipo, número e cor', () => {
 
 const FOUR = ['red', 'blue', 'green', 'yellow'];
 
-test('lápis: cada cor aparece uma vez, em posições diferentes do arranjo', () => {
+test('lápis: cada cor aparece uma vez, em posições diferentes', () => {
   for (let i = 0; i < 200; i++) {
     let n = i;
     const figure = pickPencilsFigure(FOUR, undefined, () => ((n += 37) % 200) / 200);
-    const colored = figure.cells.filter((cell) => cell.color).map((cell) => cell.color);
-    assert.deepEqual([...colored].sort(), [...FOUR].sort());
-    assert.ok(figure.cells.length >= 4);
+    assert.deepEqual(figure.cells.map((cell) => cell.color).sort(), [...FOUR].sort());
     const positions = new Set(figure.cells.map(({ x, y }) => `${x},${y}`));
-    assert.equal(positions.size, figure.cells.length);
+    assert.equal(positions.size, 4);
   }
 });
 
 test('lápis: todos os arranjos podem sair e nenhum repete o anterior', () => {
-  const seen = new Set();
-  for (let i = 0; i < 100; i++) {
-    const figure = pickPencilsFigure(FOUR, 'x', () => (i + 0.5) / 100);
-    assert.notEqual(figure.layout, 'x');
-    seen.add(figure.layout);
-  }
-  assert.equal(seen.size, 7);
-  assert.equal(
-    new Set(Array.from({ length: 100 }, (_, i) => pickPencilsFigure(FOUR, undefined, () => (i + 0.5) / 100).layout)).size,
-    8,
-  );
+  const layouts = (previous) =>
+    new Set(
+      Array.from(
+        { length: 100 },
+        (_, i) => pickPencilsFigure(FOUR, previous, () => (i + 0.5) / 100).layout,
+      ),
+    );
+  assert.equal(layouts(undefined).size, 5);
+  assert.equal(layouts('t').size, 4);
+  assert.ok(!layouts('t').has('t'));
 });
 
-test('lápis: cada posição tem um ângulo múltiplo de 45°', () => {
-  const { cells } = pickPencilsFigure(FOUR, undefined, () => 0.77);
-  assert.ok(cells.every(({ angle }) => angle % 45 === 0 && angle >= 0 && angle < 360));
-});
-
-test('lápis: arranjos de 4 posições ficam totalmente preenchidos', () => {
+test('lápis: na linha todos ficam em pé', () => {
   for (let i = 0; i < 100; i++) {
     const figure = pickPencilsFigure(FOUR, undefined, () => (i + 0.5) / 100);
-    if (figure.cells.length === 4) assert.ok(figure.cells.every((cell) => cell.color));
+    if (figure.layout === 'line') assert.ok(figure.cells.every(({ angle }) => angle === 0));
   }
+});
+
+test('lápis: nos outros arranjos todos apontam para o centro', () => {
+  const find = (layout) => {
+    for (let i = 0; i < 100; i++) {
+      const figure = pickPencilsFigure(FOUR, undefined, () => (i + 0.5) / 100);
+      if (figure.layout === layout) return figure;
+    }
+  };
+  const angles = (layout) => find(layout).cells.map(({ x, y, angle }) => `${x},${y}:${angle}`).sort();
+  // Em um quadrado 2×2 cada lápis aponta na diagonal para o meio.
+  assert.deepEqual(angles('square'), ['0,0:135', '0,1:45', '1,0:-135', '1,1:-45'].sort());
+  // Em um L, o lápis do canto aponta na diagonal e os das pontas apontam para dentro.
+  assert.equal(find('l').cells.length, 4);
 });

@@ -47,18 +47,17 @@ export function pickCupFigure(colors, maxNumber, random = Math.random) {
   };
 }
 
-// Arranjos do jogo Arrume os lápis: cada # é uma posição (um ☒ na tela).
+// Arranjos do jogo Arrume os lápis: cada # é a posição de um dos 4 lápis. Os arranjos
+// são compactos; só a linha deixa os lápis em pé, nos outros todos apontam para o centro.
 const PENCIL_LAYOUTS = [
-  { id: 'line', rows: ['####'] },
+  { id: 'line', rows: ['####'], upright: true },
   { id: 'square', rows: ['##', '##'] },
-  { id: 'x', rows: ['#.#', '.#.', '#.#'] },
-  { id: 'm', rows: ['#...#', '##.##', '#.#.#', '#...#'] },
-  { id: 'l', rows: ['#..', '#..', '###'] },
-  { id: 't', rows: ['###', '.#.', '.#.'] },
-  { id: 'stairs', rows: ['#..', '##.', '###'] },
-  { id: 'plus', rows: ['.#.', '###', '.#.'] },
-].map(({ id, rows }) => ({
+  { id: 'l', rows: ['#.', '#.', '##'] },
+  { id: 't', rows: ['###', '.#.'] },
+  { id: 'zigzag', rows: ['##.', '.##'] },
+].map(({ id, rows, upright = false }) => ({
   id,
+  upright,
   cols: rows[0].length,
   rowCount: rows.length,
   slots: rows.flatMap((row, y) =>
@@ -68,25 +67,28 @@ const PENCIL_LAYOUTS = [
 
 export const PENCIL_COUNT = 4;
 
-// Os lápis (as cores) ocupam posições sorteadas do arranjo; as demais não aparecem.
-// O arranjo nunca repete o anterior.
+// Ângulo, em graus no sentido horário, que vira um lápis de ponta para cima
+// em direção ao ponto (cx, cy).
+function angleToward({ x, y }, cx, cy) {
+  return Math.round((Math.atan2(cx - x, y - cy) * 180) / Math.PI);
+}
+
+// Os lápis ocupam as posições do arranjo em ordem sorteada. O arranjo nunca
+// repete o anterior.
 export function pickPencilsFigure(colors, previousLayout, random = Math.random) {
   const options = PENCIL_LAYOUTS.filter(({ id }) => id !== previousLayout);
   const layout = options[Math.floor(random() * options.length)];
-  const order = layout.slots.map((_, index) => index);
-  for (let i = order.length - 1; i > 0; i--) {
+  const shuffled = [...colors];
+  for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));
-    [order[i], order[j]] = [order[j], order[i]];
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  // Cada lápis aparece virado para uma das 8 direções, em múltiplos de 45°.
-  const cells = layout.slots.map(({ x, y }) => ({
-    x,
-    y,
-    color: null,
-    angle: Math.floor(random() * 8) * 45,
+  const cx = layout.slots.reduce((sum, { x }) => sum + x, 0) / layout.slots.length;
+  const cy = layout.slots.reduce((sum, { y }) => sum + y, 0) / layout.slots.length;
+  const cells = layout.slots.map((slot, index) => ({
+    ...slot,
+    color: shuffled[index],
+    angle: layout.upright ? 0 : angleToward(slot, cx, cy),
   }));
-  colors.forEach((color, index) => {
-    cells[order[index]].color = color;
-  });
   return { type: 'pencils', layout: layout.id, cols: layout.cols, rows: layout.rowCount, cells };
 }
