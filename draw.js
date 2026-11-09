@@ -142,3 +142,21 @@ export function pickPencilsFigure(colors, previousLayout, random = Math.random) 
   }));
   return { type: 'pencils', layout: layout.id, cols: layout.cols, rows: layout.rowCount, cells };
 }
+
+export const TOKEN_ROUND_SIZE = 5;
+export const TOKEN_MAX_NUMBER = 10;
+
+// Número e Fichas: sorteia 5 números diferentes de 1 a 10, cada um com uma cor
+// (as cores podem repetir).
+export function pickTokensRound(colors, random = Math.random) {
+  const numbers = Array.from({ length: TOKEN_MAX_NUMBER }, (_, index) => index + 1);
+  for (let i = numbers.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+  }
+  return numbers.slice(0, TOKEN_ROUND_SIZE).map((number) => ({
+    type: 'token',
+    number,
+    color: colors[Math.floor(random() * colors.length)],
+  }));
+}

@@ -314,6 +314,8 @@ input[type='range'] {
 #arrow,
 #pause,
 #pencils,
+#token,
+#answer-key,
 #big-number {
   display: none;
 }
@@ -353,6 +355,86 @@ input[type='range'] {
 #pencils svg {
   position: absolute;
   overflow: visible;
+}
+
+#game[data-figure='token'] #token {
+  display: flex;
+}
+
+#game[data-figure='answer'] #answer-key {
+  display: flex;
+}
+
+#token {
+  --size: min(40vw, 80dvh);
+  align-items: center;
+  gap: calc(var(--size) / 5);
+  color: #000;
+}
+
+#token-number,
+#token-dot {
+  flex: none;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+}
+
+#token-number {
+  display: grid;
+  place-items: center;
+  border: calc(var(--size) / 28) solid #000;
+  font-size: calc(var(--size) * 0.55);
+  font-weight: 700;
+  line-height: 1;
+}
+
+#token-dot {
+  box-shadow: inset 0 0 0 2px #0003;
+}
+
+#answer-key {
+  flex-direction: column;
+  align-items: center;
+  gap: 3dvh;
+  width: min(96vw, 160dvh);
+  color: #000;
+}
+
+#answer-key h2 {
+  margin: 0;
+  font-size: min(6vw, 8dvh);
+}
+
+#answer-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2vw;
+  width: 100%;
+}
+
+.answer-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1.1;
+  border: max(2px, 0.4vw) solid #000;
+  border-radius: 8%;
+  font-size: min(3.5vw, 5dvh);
+  font-weight: 700;
+}
+
+.answer-card b {
+  position: absolute;
+  top: 4%;
+  left: 7%;
+}
+
+.answer-card i {
+  width: 55%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px #0003;
 }
 
 #big-number {

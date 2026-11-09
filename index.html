@@ -69,6 +69,14 @@
           </p>
         </fieldset>
 
+        <fieldset id="token-colors-field">
+          <legend>Cores das fichas</legend>
+          <div id="token-color-list" class="colors"></div>
+          <p id="token-colors-error" class="error" hidden>
+            Marque exatamente 4 cores para jogar.
+          </p>
+        </fieldset>
+
         <label class="sound">
           <span>Som</span>
           <input type="checkbox" name="sound" />
@@ -112,6 +120,14 @@
       </svg>
       <span id="big-number"></span>
       <div id="pencils"></div>
+      <div id="token">
+        <span id="token-number"></span>
+        <i id="token-dot"></i>
+      </div>
+      <div id="answer-key">
+        <h2>Vamos conferir!</h2>
+        <div id="answer-grid"></div>
+      </div>
       <div id="hold-bar"></div>
     </div>
   </body>

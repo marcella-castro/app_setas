@@ -38,6 +38,12 @@ A criança tem 4 lápis de cores diferentes. Cada figura mostra 4 lápis desenha
 
 [Vídeo: como jogar Arrume os lápis](https://www.instagram.com/reel/DePhTpzNbrz/?utm_source=ig_web_copy_link&srtk=NTc4MTIwNjQ2YQ==)
 
+### Número e Fichas
+
+A tela mostra um número de 1 a 10 dentro de um círculo e, ao lado, uma bolinha de uma cor. Na vida real, a criança coloca uma ficha daquela cor na caixinha daquele número. São 5 figuras por rodada, com números diferentes. Depois da última aparece o gabarito, com as caixinhas de 1 a 10 e as fichas nos lugares certos, para a criança conferir. Segure a tela por 1 segundo para encerrar.
+
+[Vídeo: como jogar Número e Fichas](https://www.instagram.com/reel/DeFOSgGNvVG/)
+
 ## Configurações
 
 - **Countdown:** de 0 a 10 segundos antes da primeira figura.
@@ -45,6 +51,7 @@ A criança tem 4 lápis de cores diferentes. Cada figura mostra 4 lápis desenha
 - **Maior número:** de 3 a 6, no modo Copo. Os números vão sempre de 1 até esse valor.
 - **Cores:** quais das 9 cores entram nos modos Cores e Copo. A seleção é a mesma nos dois.
 - **Cores dos lápis:** no modo Arrume os lápis, exatamente 4 das 9 cores, as dos lápis que você tem. A seleção é própria desse modo.
+- **Cores das fichas:** no modo Número e Fichas, exatamente 4 das 9 cores (padrão azul, vermelho, verde e amarelo). A seleção é própria desse modo.
 - **Som:** bipe no countdown e a cada figura. O bipe é igual para todas as figuras.
 
 Os valores ficam salvos no celular.

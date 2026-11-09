@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { pickCupFigure, pickFigure, pickNumberFigure, pickPencilsFigure } from '../draw.js';
+import { pickCupFigure, pickFigure, pickNumberFigure, pickPencilsFigure, pickTokensRound } from '../draw.js';
 
 // Percorre todo o intervalo de Math.random em passos iguais, para que as
 // frequências sejam exatas e o teste nunca falhe por azar.
@@ -180,4 +180,32 @@ test('lápis: o X aponta os 4 lápis na diagonal para o centro', () => {
       assert.deepEqual(figure.cells.map(({ angle }) => angle).sort((a, b) => a - b), [-135, -45, 45, 135]);
     }
   }
+});
+
+test('fichas: sorteia 5 números diferentes de 1 a 10, cada um com uma das cores', () => {
+  for (let i = 0; i < 200; i++) {
+    let n = i;
+    const round = pickTokensRound(FOUR, () => ((n += 37) % 200) / 200);
+    assert.equal(round.length, 5);
+    assert.equal(new Set(round.map((figure) => figure.number)).size, 5);
+    for (const figure of round) {
+      assert.equal(figure.type, 'token');
+      assert.ok(figure.number >= 1 && figure.number <= 10);
+      assert.ok(FOUR.includes(figure.color));
+    }
+  }
+});
+
+test('fichas: todos os números e todas as cores podem sair', () => {
+  const numbers = new Set();
+  const colors = new Set();
+  for (let i = 0; i < 400; i++) {
+    let n = i;
+    for (const { number, color } of pickTokensRound(FOUR, () => ((n += 37) % 400) / 400)) {
+      numbers.add(number);
+      colors.add(color);
+    }
+  }
+  assert.equal(numbers.size, 10);
+  assert.equal(colors.size, 4);
 });
