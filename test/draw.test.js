@@ -143,6 +143,11 @@ test('lápis: todos os arranjos podem sair e nenhum repete o anterior', () => {
   );
 });
 
+test('lápis: cada posição tem um ângulo múltiplo de 45°', () => {
+  const { cells } = pickPencilsFigure(FOUR, undefined, () => 0.77);
+  assert.ok(cells.every(({ angle }) => angle % 45 === 0 && angle >= 0 && angle < 360));
+});
+
 test('lápis: arranjos de 4 posições ficam totalmente preenchidos', () => {
   for (let i = 0; i < 100; i++) {
     const figure = pickPencilsFigure(FOUR, undefined, () => (i + 0.5) / 100);

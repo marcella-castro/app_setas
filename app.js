@@ -62,6 +62,7 @@ const GAMES = [
     name: 'Arrume os lápis',
     help: 'https://www.instagram.com/reel/DePhTpzNbrz/?utm_source=ig_web_copy_link&srtk=NTc4MTIwNjQ2YQ==',
     usesPencilColors: true,
+    flashColor: '#ffffff',
     pick: ({ pencilColors }, previous) => pickPencilsFigure(pencilColors, previous?.layout),
   },
 ];
@@ -241,17 +242,19 @@ function writeBigNumber(number, ink) {
 
 const SVG = 'http://www.w3.org/2000/svg';
 
-// Um ☒: quadrado com X. Lápis levam a cor dele; posições vazias, só o contorno cinza.
-function pencilCell(color) {
-  const pencil = color && PALETTE.find(({ id }) => id === color);
-  const fill = pencil ? pencil.hex : 'none';
-  const line = pencil ? pencil.ink : '#666';
-  const edge = pencil ? (pencil.outlined ? '#fff' : pencil.hex) : '#666';
+// Um lápis de pé, com a ponta para cima, que depois é girado para o ângulo sorteado.
+function pencilCell(color, angle) {
+  const { hex } = PALETTE.find(({ id }) => id === color);
   const svg = document.createElementNS(SVG, 'svg');
   svg.setAttribute('viewBox', '0 0 100 100');
+  svg.style.transform = `rotate(${angle}deg)`;
   svg.innerHTML =
-    `<rect x="4" y="4" width="92" height="92" rx="6" fill="${fill}" stroke="${edge}" stroke-width="4"/>` +
-    `<path d="M20 20L80 80M80 20L20 80" stroke="${line}" stroke-width="8" stroke-linecap="round"/>`;
+    `<path d="M38 28H62V86Q62 94 50 94Q38 94 38 86Z" fill="${hex}"/>` +
+    '<path d="M38 28H44V90H42Q38 90 38 86Z" fill="#fff" opacity=".28"/>' +
+    '<path d="M56 28H62V86Q62 90 58 90H56Z" fill="#000" opacity=".22"/>' +
+    '<path d="M38 28L50 6L62 28Z" fill="#e9c08c"/>' +
+    `<path d="M45.5 17L50 6L54.5 17Z" fill="${hex}"/>` +
+    '<path d="M38 28L50 6L62 28" fill="none" stroke="#0003" stroke-width="1.5"/>';
   return svg;
 }
 
@@ -260,14 +263,16 @@ function displayPencils({ cols, rows, cells }) {
   board.style.setProperty('--cols', cols);
   board.style.setProperty('--rows', rows);
   board.replaceChildren(
-    ...cells.map(({ x, y, color }) => {
-      const cell = pencilCell(color);
-      cell.style.gridColumn = x + 1;
-      cell.style.gridRow = y + 1;
-      return cell;
-    }),
+    ...cells
+      .filter(({ color }) => color)
+      .map(({ x, y, color, angle }) => {
+        const cell = pencilCell(color, angle);
+        cell.style.gridColumn = x + 1;
+        cell.style.gridRow = y + 1;
+        return cell;
+      }),
   );
-  showFigure('pencils');
+  showFigure('pencils', '#ffffff');
 }
 
 function display(figure) {

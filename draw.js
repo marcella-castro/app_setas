@@ -68,7 +68,7 @@ const PENCIL_LAYOUTS = [
 
 export const PENCIL_COUNT = 4;
 
-// Os lápis (as cores) ocupam posições sorteadas do arranjo; as demais ficam vazias.
+// Os lápis (as cores) ocupam posições sorteadas do arranjo; as demais não aparecem.
 // O arranjo nunca repete o anterior.
 export function pickPencilsFigure(colors, previousLayout, random = Math.random) {
   const options = PENCIL_LAYOUTS.filter(({ id }) => id !== previousLayout);
@@ -78,7 +78,13 @@ export function pickPencilsFigure(colors, previousLayout, random = Math.random) 
     const j = Math.floor(random() * (i + 1));
     [order[i], order[j]] = [order[j], order[i]];
   }
-  const cells = layout.slots.map(({ x, y }) => ({ x, y, color: null }));
+  // Cada lápis aparece virado para uma das 8 direções, em múltiplos de 45°.
+  const cells = layout.slots.map(({ x, y }) => ({
+    x,
+    y,
+    color: null,
+    angle: Math.floor(random() * 8) * 45,
+  }));
   colors.forEach((color, index) => {
     cells[order[index]].color = color;
   });
