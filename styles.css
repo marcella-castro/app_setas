@@ -315,6 +315,8 @@ input[type='range'] {
 #pause,
 #pencils,
 #token,
+#grid,
+#next-figure,
 #answer-key,
 #big-number {
   display: none;
@@ -359,6 +361,14 @@ input[type='range'] {
 
 #game[data-figure='token'] #token {
   display: flex;
+}
+
+#game[data-figure='grid'] #grid {
+  display: grid;
+}
+
+#game[data-figure='grid'] #next-figure {
+  display: block;
 }
 
 #game[data-figure='answer'] #answer-key {
@@ -411,6 +421,40 @@ input[type='range'] {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 2vw;
   width: 100%;
+}
+
+#grid {
+  --size: 4;
+  grid-template-columns: repeat(var(--size), 1fr);
+  width: min(92vw, 92dvh);
+  aspect-ratio: 1;
+  border: 3px solid #000;
+  color: #000;
+}
+
+#grid div {
+  display: grid;
+  place-items: center;
+  border: 1.5px solid #0006;
+  font-size: min(18vw, 18dvh);
+  font-weight: 700;
+  line-height: 1;
+}
+
+#next-figure {
+  position: absolute;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  min-height: 56px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 #next-round {

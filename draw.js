@@ -160,3 +160,30 @@ export function pickTokensRound(colors, random = Math.random) {
     color: colors[Math.floor(random() * colors.length)],
   }));
 }
+
+export const GRID_SIZE = 4;
+export const GRID_NUMBERS = 3;
+export const GRID_MAX_NUMBER = 6;
+
+// Dadomente: sorteia 3 números diferentes de 1 a 6 e os põe em quadradinhos
+// diferentes do quadriculado 4 por 4.
+export function pickGridFigure(random = Math.random) {
+  const shuffle = (items) => {
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+    return items;
+  };
+  const numbers = shuffle(Array.from({ length: GRID_MAX_NUMBER }, (_, index) => index + 1));
+  const squares = shuffle(Array.from({ length: GRID_SIZE ** 2 }, (_, index) => index));
+  return {
+    type: 'grid',
+    size: GRID_SIZE,
+    cells: numbers.slice(0, GRID_NUMBERS).map((number, index) => ({
+      number,
+      x: squares[index] % GRID_SIZE,
+      y: Math.floor(squares[index] / GRID_SIZE),
+    })),
+  };
+}

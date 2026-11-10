@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { pickCupFigure, pickFigure, pickNumberFigure, pickPencilsFigure, pickTokensRound } from '../draw.js';
+import { pickCupFigure, pickFigure, pickGridFigure, pickNumberFigure, pickPencilsFigure, pickTokensRound } from '../draw.js';
 
 // Percorre todo o intervalo de Math.random em passos iguais, para que as
 // frequências sejam exatas e o teste nunca falhe por azar.
@@ -208,4 +208,19 @@ test('fichas: todos os números e todas as cores podem sair', () => {
   }
   assert.equal(numbers.size, 10);
   assert.equal(colors.size, 4);
+});
+
+test('dadomente: 3 números diferentes de 1 a 6 em quadradinhos diferentes do 4 por 4', () => {
+  for (let i = 0; i < 200; i++) {
+    let n = i;
+    const figure = pickGridFigure(() => ((n += 37) % 200) / 200);
+    assert.equal(figure.type, 'grid');
+    assert.equal(figure.cells.length, 3);
+    assert.equal(new Set(figure.cells.map(({ number }) => number)).size, 3);
+    assert.equal(new Set(figure.cells.map(({ x, y }) => `${x},${y}`)).size, 3);
+    for (const { number, x, y } of figure.cells) {
+      assert.ok(number >= 1 && number <= 6);
+      assert.ok(x >= 0 && x < 4 && y >= 0 && y < 4);
+    }
+  }
 });

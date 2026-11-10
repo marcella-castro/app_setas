@@ -3,6 +3,7 @@ import {
   TOKEN_MAX_NUMBER,
   pickCupFigure,
   pickFigure,
+  pickGridFigure,
   pickNumberFigure,
   pickPencilsFigure,
   pickTokensRound,
@@ -26,6 +27,16 @@ const PALETTE = [
   { id: 'black', name: 'Preto', hex: '#000000', ink: '#ffffff', outlined: true },
   { id: 'gray', name: 'Cinza', hex: '#9e9e9e', ink: '#000000' },
 ];
+
+// Cor de cada número no Dadomente.
+const GRID_COLORS = {
+  1: '#43a047',
+  2: '#8e24aa',
+  3: '#fb8c00',
+  4: '#e53935',
+  5: '#1e88e5',
+  6: '#f06292',
+};
 
 const ARROWS_TUTORIAL = 'https://www.instagram.com/reel/DcWIYVIhAKV/?dlrf=MXUzZDNlbTRhZjBqZw==';
 
@@ -75,6 +86,15 @@ const GAMES = [
     flashColor: '#ffffff',
     // Uma rodada tem um número fixo de figuras e termina no gabarito.
     pickRound: ({ tokenColors }) => pickTokensRound(tokenColors),
+  },
+  {
+    id: 'grid',
+    name: 'Dadomente',
+    help: 'https://www.instagram.com/p/Dez7gbRxUuO/',
+    flashColor: '#ffffff',
+    // A figura fica na tela até a pessoa tocar em Próxima.
+    manual: true,
+    pick: () => pickGridFigure(),
   },
 ];
 
@@ -202,6 +222,7 @@ function refreshForm() {
   }
   document.querySelector('#countdown-value').value = formatSeconds(settings.countdown);
   document.querySelector('#figure-value').value = formatSeconds(settings.figureSeconds);
+  document.querySelector('#figure-field').hidden = Boolean(selected.manual);
   document.querySelector('#max-number-value').value = settings.maxNumber;
   document.querySelector('#max-number-field').hidden = !selected.usesMaxNumber;
   document.querySelector('#colors-field').hidden = !selected.usesColors;
@@ -311,6 +332,18 @@ function displayToken({ number, color }) {
 }
 
 // Gabarito: as caixinhas de 1 a 10 em duas linhas, com a ficha de cada número sorteado.
+function displayGrid({ size, cells }) {
+  const board = document.querySelector('#grid');
+  board.style.setProperty('--size', size);
+  const squares = Array.from({ length: size * size }, () => document.createElement('div'));
+  for (const { number, x, y } of cells) {
+    squares[y * size + x].textContent = number;
+    squares[y * size + x].style.color = GRID_COLORS[number];
+  }
+  board.replaceChildren(...squares);
+  showFigure('grid', '#ffffff');
+}
+
 function displayAnswerKey(figures) {
   document.querySelector('#answer-grid').replaceChildren(
     ...Array.from({ length: TOKEN_MAX_NUMBER }, (_, index) => {
@@ -333,6 +366,10 @@ function displayAnswerKey(figures) {
 }
 
 function display(figure) {
+  if (figure.type === 'grid') {
+    displayGrid(figure);
+    return;
+  }
   if (figure.type === 'token') {
     displayToken(figure);
     return;
@@ -392,6 +429,7 @@ function runFigure(time, settings, playSound = beepFigure) {
   }
   display(lastFigure);
   playSound();
+  if (definition.manual) return;
   const next = time + settings.figureSeconds * 1000;
   at(next - FLASH_MS, () => {
     showFigure('flash', definition.flashColor);
@@ -428,6 +466,9 @@ function startRound(settings) {
 }
 
 document.querySelector('#next-round').addEventListener('click', () => startRound(currentSettings));
+document
+  .querySelector('#next-figure')
+  .addEventListener('click', () => runFigure(performance.now(), currentSettings));
 
 function startGame(settings) {
   currentSettings = settings;

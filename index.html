@@ -45,7 +45,7 @@
           <input type="range" name="countdown" min="0" max="10" step="1" />
         </label>
 
-        <label class="slider">
+        <label class="slider" id="figure-field">
           <span class="slider-title">Tempo de cada figura <output id="figure-value"></output></span>
           <input type="range" name="figureSeconds" min="0.5" max="10" step="0.5" />
         </label>
@@ -124,6 +124,8 @@
         <span id="token-number"></span>
         <i id="token-dot"></i>
       </div>
+      <div id="grid"></div>
+      <button type="button" id="next-figure">Próxima</button>
       <div id="answer-key">
         <h2>Vamos conferir!</h2>
         <div id="answer-grid"></div>

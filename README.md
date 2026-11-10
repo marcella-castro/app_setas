@@ -44,10 +44,16 @@ A tela mostra um número de 1 a 10 dentro de um círculo e, ao lado, uma bolinha
 
 [Vídeo: como jogar Número e Fichas](https://www.instagram.com/reel/DeFOSgGNvVG/)
 
+### Dadomente
+
+A tela mostra um quadriculado de 4 por 4 com 3 números diferentes de 1 a 6, cada um de uma cor, em quadradinhos sorteados. A figura fica na tela até você tocar em **Próxima**, no canto inferior direito. Por isso o jogo não usa o tempo de cada figura. Segure a tela por 1 segundo para encerrar.
+
+[Vídeo: como jogar Dadomente](https://www.instagram.com/p/Dez7gbRxUuO/)
+
 ## Configurações
 
 - **Countdown:** de 0 a 10 segundos antes da primeira figura.
-- **Tempo de cada figura:** de 0,5 a 10 segundos.
+- **Tempo de cada figura:** de 0,5 a 10 segundos (não vale para o Dadomente, que espera o toque em Próxima).
 - **Maior número:** de 3 a 6, no modo Copo. Os números vão sempre de 1 até esse valor.
 - **Cores:** quais das 9 cores entram nos modos Cores e Copo. A seleção é a mesma nos dois.
 - **Cores dos lápis:** no modo Arrume os lápis, exatamente 4 das 9 cores, as dos lápis que você tem. A seleção é própria desse modo.
