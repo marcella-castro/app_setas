@@ -1,4 +1,4 @@
-const CACHE = 'setas-v6';
+const CACHE = 'setas-v7';
 const FILES = [
   './',
   'index.html',
