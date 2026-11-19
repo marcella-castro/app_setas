@@ -1,4 +1,4 @@
-const CACHE = 'setas-v7';
+const CACHE = 'setas-v8';
 const FILES = [
   './',
   'index.html',
@@ -9,6 +9,8 @@ const FILES = [
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/apple-touch-icon.png',
+  'material/dadomente.pdf',
+  'material/numero-e-fichas.pdf',
 ];
 
 self.addEventListener('install', (event) => {

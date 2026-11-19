@@ -82,6 +82,7 @@ const GAMES = [
     id: 'tokens',
     name: 'Número e Fichas',
     help: 'https://www.instagram.com/reel/DeFOSgGNvVG/',
+    material: 'material/numero-e-fichas.pdf',
     usesTokenColors: true,
     flashColor: '#ffffff',
     // Uma rodada tem um número fixo de figuras e termina no gabarito.
@@ -91,6 +92,7 @@ const GAMES = [
     id: 'grid',
     name: 'Dadomente',
     help: 'https://www.instagram.com/p/Dez7gbRxUuO/',
+    material: 'material/dadomente.pdf',
     flashColor: '#ffffff',
     // A figura fica na tela até a pessoa tocar em Próxima.
     manual: true,
@@ -217,6 +219,9 @@ function refreshForm() {
   }
   document.querySelector('#game-title').textContent = selected.name;
   document.querySelector('#help-link').href = selected.help;
+  const materialLink = document.querySelector('#material-link');
+  materialLink.hidden = !selected.material;
+  if (selected.material) materialLink.href = selected.material;
   for (const button of gameList.children) {
     button.setAttribute('aria-current', String(button.dataset.game === selected.id));
   }

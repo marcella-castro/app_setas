@@ -44,11 +44,15 @@ A tela mostra um número de 1 a 10 dentro de um círculo e, ao lado, uma bolinha
 
 [Vídeo: como jogar Número e Fichas](https://www.instagram.com/reel/DeFOSgGNvVG/)
 
+Material de apoio: [PDF para imprimir](material/numero-e-fichas.pdf), com as caixinhas de 1 a 10 e 20 fichas. Também há um link para baixá-lo na tela do jogo.
+
 ### Dadomente
 
 A tela mostra um quadriculado de 4 por 4 com 3 números diferentes de 1 a 6, cada um de uma cor, em quadradinhos sorteados. A figura fica na tela até você tocar em **Próxima**, no canto inferior direito. Por isso o jogo não usa o tempo de cada figura. Segure a tela por 1 segundo para encerrar.
 
 [Vídeo: como jogar Dadomente](https://www.instagram.com/p/Dez7gbRxUuO/)
+
+Material de apoio: [PDF para imprimir](material/dadomente.pdf), com as 12 peças de dado (2 dados) e o tabuleiro 4 por 4. Também há um link para baixá-lo na tela do jogo.
 
 ## Configurações
 
