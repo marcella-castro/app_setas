@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { pickCupFigure, pickFigure, pickGridFigure, pickNumberFigure, pickPencilsFigure, pickTokensRound } from '../draw.js';
+import { PAIR_COUNT, PAIR_EMOJIS, layoutPairEmojis, pickPairRound, pickCupFigure, pickFigure, pickGridFigure, pickNumberFigure, pickPencilsFigure, pickTokensRound } from '../draw.js';
 
 // Percorre todo o intervalo de Math.random em passos iguais, para que as
 // frequências sejam exatas e o teste nunca falhe por azar.
@@ -221,6 +221,41 @@ test('dadomente: 3 números diferentes de 1 a 6 em quadradinhos diferentes do 4 
     for (const { number, x, y } of figure.cells) {
       assert.ok(number >= 1 && number <= 6);
       assert.ok(x >= 0 && x < 4 && y >= 0 && y < 4);
+    }
+  }
+});
+
+test('Encontre o par: não repete emojis na lista', () => {
+  assert.equal(new Set(PAIR_EMOJIS).size, PAIR_EMOJIS.length);
+});
+
+test('Encontre o par: sorteia dois conjuntos com exatamente um emoji em comum', () => {
+  for (let i = 0; i < 100; i++) {
+    const { common, sides } = pickPairRound();
+    assert.equal(sides[0].length, PAIR_COUNT);
+    assert.equal(sides[1].length, PAIR_COUNT);
+    assert.equal(new Set(sides[0]).size, PAIR_COUNT);
+    assert.equal(new Set(sides[1]).size, PAIR_COUNT);
+    const shared = sides[0].filter((emoji) => sides[1].includes(emoji));
+    assert.deepEqual(shared, [common]);
+  }
+});
+
+test('Encontre o par: espalha os emojis dentro do quadro e sem sobreposição', () => {
+  for (const aspect of [0.9, 1, 1.4]) {
+    for (let i = 0; i < 50; i++) {
+      const emojis = pickPairRound().sides[0];
+      const items = layoutPairEmojis(emojis, aspect);
+      assert.deepEqual(items.map((item) => item.emoji).sort(), [...emojis].sort());
+      for (const { x, y, size } of items) {
+        assert.ok(x - size / 2 >= -1e-9 && x + size / 2 <= aspect + 1e-9);
+        assert.ok(y - size / 2 >= -1e-9 && y + size / 2 <= 1 + 1e-9);
+      }
+      for (const [index, a] of items.entries()) {
+        for (const b of items.slice(index + 1)) {
+          assert.ok(Math.hypot(a.x - b.x, a.y - b.y) >= (a.size + b.size) / 2);
+        }
+      }
     }
   }
 });

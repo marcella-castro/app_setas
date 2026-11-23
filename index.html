@@ -58,6 +58,18 @@
           <input type="range" name="maxNumber" min="3" max="6" step="1" />
         </label>
 
+        <label class="slider" id="best-of-field">
+          <span class="slider-title">Melhor de <output id="best-of-value"></output></span>
+          <input type="range" name="bestOf" min="3" max="11" step="2" />
+        </label>
+
+        <label class="slider" id="pair-seconds-field">
+          <span class="slider-title">
+            Tempo máximo de cada rodada <output id="pair-seconds-value"></output>
+          </span>
+          <input type="range" name="pairSeconds" min="5" max="30" step="1" />
+        </label>
+
         <fieldset id="colors-field">
           <legend>Cores</legend>
           <div id="color-list" class="colors"></div>
@@ -76,7 +88,7 @@
           <legend>Cores das fichas</legend>
           <div id="token-color-list" class="colors"></div>
           <p id="token-colors-error" class="error" hidden>
-            Marque exatamente 4 cores para jogar.
+            Marque pelo menos uma cor para jogar.
           </p>
         </fieldset>
 
@@ -86,7 +98,7 @@
         </label>
 
         <button type="submit" id="start">Iniciar</button>
-        <p class="hint">Durante o jogo, segure a tela por 1 segundo para encerrar.</p>
+        <p id="exit-hint" class="hint">Durante o jogo, segure a tela por 1 segundo para encerrar.</p>
         <p id="ios-hint" class="hint" hidden>
           Para jogar em tela cheia no iPhone, toque em Compartilhar e depois em Adicionar à Tela de
           Início.
@@ -128,6 +140,13 @@
         <i id="token-dot"></i>
       </div>
       <div id="grid"></div>
+      <div id="pair">
+        <div class="pair-side" id="pair-left"><div class="pair-frame"></div></div>
+        <div class="pair-side" id="pair-right"><div class="pair-frame"></div></div>
+        <div id="pair-score"><b id="score-left">0</b><b id="score-right">0</b></div>
+        <button type="button" id="pair-again" hidden>Jogar de novo</button>
+        <p id="pair-rotate">Gire o aparelho para jogar</p>
+      </div>
       <button type="button" id="next-figure">Próxima</button>
       <div id="answer-key">
         <h2>Vamos conferir!</h2>

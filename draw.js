@@ -187,3 +187,71 @@ export function pickGridFigure(random = Math.random) {
     })),
   };
 }
+
+export const PAIR_COUNT = 8;
+
+// Emojis do Encontre o par: bem distintos entre si, para o par ser fácil de reconhecer.
+export const PAIR_EMOJIS = [
+  '🦎', '🤖', '🗿', '🔥', '💎', '🎤', '🦐', '🍩', '🎹', '🔧', '🎸', '🥑', '🥐', '🦄', '🐙',
+  '🦋', '🐢', '🐳', '🦊', '🐸', '🐧', '🦉', '🐝', '🐞', '🦀', '🐘', '🦒', '🐊', '🦖', '🌵',
+  '🍄', '🌻', '🍎', '🍌', '🍉', '🍇', '🍓', '🍕', '🍔', '🌮', '🍦', '🍪', '🎂', '🍿', '🥕',
+  '🌽', '🍒', '🥝', '🚀', '🚗', '🚲', '⛵', '🚁', '⚽', '🏀', '🎲', '🎯', '🎨', '🎺', '🥁',
+  '🎻', '📷', '💡', '🔑', '🔔', '🎈', '🎁', '🧲', '🔨', '🧸', '👑', '🌈', '⭐', '🌙', '☀️',
+  '⚡', '🌋', '🏰', '🛸', '👻', '💀', '👽', '🎃', '🦷', '👀', '🧠', '🍀', '🪁', '🪐', '🥨',
+  '🧀', '🍯',
+];
+
+function shuffled(items, random) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// Encontre o par: dois conjuntos de 8 emojis com exatamente um emoji em comum.
+export function pickPairRound(random = Math.random) {
+  const pool = shuffled(PAIR_EMOJIS, random);
+  const common = pool[0];
+  const others = PAIR_COUNT - 1;
+  return {
+    common,
+    sides: [
+      shuffled([common, ...pool.slice(1, 1 + others)], random),
+      shuffled([common, ...pool.slice(1 + others, 1 + 2 * others)], random),
+    ],
+  };
+}
+
+const PAIR_MIN_SIZE = 0.16;
+const PAIR_MAX_SIZE = 0.3;
+const PAIR_GAP = 0.01;
+
+// Espalha os emojis num quadro de altura 1 e largura aspect, sem sobreposição.
+// Os tamanhos são frações da altura; x e y são o centro de cada emoji.
+export function layoutPairEmojis(emojis, aspect, random = Math.random) {
+  const sizes = emojis
+    .map(() => PAIR_MIN_SIZE + random() * (PAIR_MAX_SIZE - PAIR_MIN_SIZE))
+    .sort((a, b) => b - a);
+  const placed = [];
+  sizes.forEach((wanted, index) => {
+    for (let size = wanted; ; size *= 0.92) {
+      const radius = size / 2;
+      for (let attempt = 0; attempt < 200; attempt++) {
+        const x = radius + random() * Math.max(0, aspect - size);
+        const y = radius + random() * (1 - size);
+        const free = placed.every(
+          (other) => Math.hypot(other.x - x, other.y - y) >= other.size / 2 + radius + PAIR_GAP,
+        );
+        if (free) {
+          placed.push({ x, y, size, angle: (random() * 2 - 1) * 35 });
+          return;
+        }
+      }
+    }
+  });
+  // Os maiores foram colocados primeiro; o emoji de cada tamanho é sorteado.
+  const order = shuffled(placed, random);
+  return emojis.map((emoji, index) => ({ emoji, ...order[index] }));
+}

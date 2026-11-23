@@ -3,8 +3,10 @@ import {
   TOKEN_MAX_NUMBER,
   pickCupFigure,
   pickFigure,
+  layoutPairEmojis,
   pickGridFigure,
   pickNumberFigure,
+  pickPairRound,
   pickPencilsFigure,
   pickTokensRound,
 } from './draw.js';
@@ -26,6 +28,7 @@ const PALETTE = [
   // A borda branca diferencia o preto do flash entre as figuras.
   { id: 'black', name: 'Preto', hex: '#000000', ink: '#ffffff', outlined: true },
   { id: 'gray', name: 'Cinza', hex: '#9e9e9e', ink: '#000000' },
+  { id: 'white', name: 'Branco', hex: '#ffffff', ink: '#000000' },
 ];
 
 // Cor de cada número no Dadomente.
@@ -98,12 +101,20 @@ const GAMES = [
     manual: true,
     pick: () => pickGridFigure(),
   },
+  {
+    id: 'pair',
+    name: 'Encontre o par',
+    help: 'https://www.instagram.com/reels/Dfcl4KARuPh/',
+    // Partida com jogo próprio (dois jogadores), que não passa pelo sorteio de figuras.
+    pair: true,
+  },
 ];
 
-// Jogos em que a pessoa escolhe exatamente 4 cores, cada um com a sua seleção.
+// Jogos com a própria seleção de cores. Nos lápis são exatamente 4; nas fichas,
+// quantas a pessoa quiser (pelo menos 1).
 const LIMITED_COLORS = [
-  { setting: 'pencilColors', input: 'pencilColor', uses: 'usesPencilColors', id: 'pencil' },
-  { setting: 'tokenColors', input: 'tokenColor', uses: 'usesTokenColors', id: 'token' },
+  { setting: 'pencilColors', input: 'pencilColor', uses: 'usesPencilColors', id: 'pencil', exact: true },
+  { setting: 'tokenColors', input: 'tokenColor', uses: 'usesTokenColors', id: 'token', exact: false },
 ];
 
 const gameById = (id) => GAMES.find((game) => game.id === id);
@@ -116,6 +127,8 @@ const DEFAULTS = {
   pencilColors: ['red', 'blue', 'green', 'yellow'],
   tokenColors: ['blue', 'red', 'green', 'yellow'],
   maxNumber: 3,
+  bestOf: 5,
+  pairSeconds: 15,
   sound: true,
 };
 
@@ -156,6 +169,8 @@ function readForm() {
       ]),
     ),
     maxNumber: Number(form.elements.maxNumber.value),
+    bestOf: Number(form.elements.bestOf.value),
+    pairSeconds: Number(form.elements.pairSeconds.value),
     sound: form.elements.sound.checked,
   };
 }
@@ -207,12 +222,14 @@ function refreshForm() {
   const selected = gameById(settings.mode);
   const missingColor = selected.usesColors && settings.colors.length === 0;
   let wrongColors = false;
-  for (const { setting, input, uses, id } of LIMITED_COLORS) {
+  for (const { setting, input, uses, id, exact } of LIMITED_COLORS) {
     const count = settings[setting].length;
-    const wrong = selected[uses] && count !== PENCIL_COUNT;
+    const wrong = selected[uses] && (exact ? count !== PENCIL_COUNT : count === 0);
     wrongColors ||= wrong;
-    for (const box of form.querySelectorAll(`[name="${input}"]`)) {
-      box.disabled = count >= PENCIL_COUNT && !box.checked;
+    if (exact) {
+      for (const box of form.querySelectorAll(`[name="${input}"]`)) {
+        box.disabled = count >= PENCIL_COUNT && !box.checked;
+      }
     }
     document.querySelector(`#${id}-colors-field`).hidden = !selected[uses];
     document.querySelector(`#${id}-colors-error`).hidden = !wrong;
@@ -227,7 +244,14 @@ function refreshForm() {
   }
   document.querySelector('#countdown-value').value = formatSeconds(settings.countdown);
   document.querySelector('#figure-value').value = formatSeconds(settings.figureSeconds);
-  document.querySelector('#figure-field').hidden = Boolean(selected.manual);
+  document.querySelector('#figure-field').hidden = Boolean(selected.manual || selected.pair);
+  document.querySelector('#best-of-value').value = settings.bestOf;
+  document.querySelector('#best-of-field').hidden = !selected.pair;
+  document.querySelector('#pair-seconds-value').value = formatSeconds(settings.pairSeconds);
+  document.querySelector('#pair-seconds-field').hidden = !selected.pair;
+  document.querySelector('#exit-hint').textContent = selected.pair
+    ? 'Durante o jogo, segure o placar no centro por 1 segundo para encerrar.'
+    : 'Durante o jogo, segure a tela por 1 segundo para encerrar.';
   document.querySelector('#max-number-value').value = settings.maxNumber;
   document.querySelector('#max-number-field').hidden = !selected.usesMaxNumber;
   document.querySelector('#colors-field').hidden = !selected.usesColors;
@@ -241,6 +265,8 @@ function fillForm(settings) {
   form.elements.countdown.value = settings.countdown;
   form.elements.figureSeconds.value = settings.figureSeconds;
   form.elements.maxNumber.value = settings.maxNumber;
+  form.elements.bestOf.value = settings.bestOf;
+  form.elements.pairSeconds.value = settings.pairSeconds;
   form.elements.sound.checked = settings.sound;
   renderColorOptions('#color-list', 'color', settings.colors);
   for (const { setting, input, id } of LIMITED_COLORS) {
@@ -277,6 +303,8 @@ function beep(frequency, durationMs) {
 const beepCountdown = () => beep(660, 120);
 const beepStart = () => beep(1175, 300);
 const beepFigure = () => beep(880, 70);
+const beepRight = () => beep(1175, 200);
+const beepWrong = () => beep(180, 250);
 
 // Tela do jogo
 
@@ -302,7 +330,7 @@ function pencilCell(color, angle) {
   svg.setAttribute('viewBox', '0 0 100 100');
   svg.style.transform = `rotate(${angle}deg)`;
   svg.innerHTML =
-    `<path d="M38 28H62V86Q62 94 50 94Q38 94 38 86Z" fill="${hex}"/>` +
+    `<path d="M38 28H62V86Q62 94 50 94Q38 94 38 86Z" fill="${hex}" stroke="#0004" stroke-width="1.5"/>` +
     '<path d="M38 28H44V90H42Q38 90 38 86Z" fill="#fff" opacity=".28"/>' +
     '<path d="M56 28H62V86Q62 90 58 90H56Z" fill="#000" opacity=".22"/>' +
     '<path d="M38 28L50 6L62 28Z" fill="#e9c08c"/>' +
@@ -407,6 +435,11 @@ function at(time, action) {
 
 function runCountdown(remaining, time, settings) {
   if (remaining === 0) {
+    if (gameById(settings.mode).pair) {
+      beepStart();
+      startPairMatch(settings);
+      return;
+    }
     runFigure(time, settings, beepStart);
     return;
   }
@@ -415,6 +448,123 @@ function runCountdown(remaining, time, settings) {
   beepCountdown();
   at(time + 1000, () => runCountdown(remaining - 1, time + 1000, settings));
 }
+
+// Encontre o par: dois jogadores, um em cada ponta do aparelho deitado.
+
+const PAIR_LOCK_MS = 1500;
+const PAIR_FOUND_MS = 1500;
+// Faixa no meio da tela, onde fica o placar, sem emojis.
+const PAIR_CENTER_BAND = 36;
+
+const pairSides = [document.querySelector('#pair-left'), document.querySelector('#pair-right')];
+const pairFrames = pairSides.map((side) => side.querySelector('.pair-frame'));
+const pairScoreBoxes = [document.querySelector('#score-left'), document.querySelector('#score-right')];
+const pairAgain = document.querySelector('#pair-again');
+const pair = { scores: [0, 0], target: 0, seconds: 0, active: false, lockedUntil: [0, 0], round: null, timers: [] };
+
+function clearPair() {
+  clearTimeout(timer);
+  pair.timers.forEach(clearTimeout);
+  pair.timers = [];
+  pair.active = false;
+}
+
+function renderPairScore() {
+  pairScoreBoxes.forEach((box, index) => {
+    box.textContent = pair.scores[index];
+  });
+}
+
+// Cada metade é um quadro girado para ficar de frente para o jogador da ponta.
+function layoutPair() {
+  const { clientWidth: width, clientHeight: height } = game;
+  const frameHeight = Math.max(1, width / 2 - PAIR_CENTER_BAND);
+  const aspect = height / frameHeight;
+  pairFrames.forEach((frame, index) => {
+    frame.style.width = `${height}px`;
+    frame.style.height = `${frameHeight}px`;
+    frame.style.top = `${height / 2}px`;
+    frame.style.left = `${(index === 0 ? 0 : PAIR_CENTER_BAND) + frameHeight / 2}px`;
+    const items = layoutPairEmojis(pair.round.sides[index], aspect);
+    frame.replaceChildren(
+      ...items.map(({ emoji, x, y, size, angle }) => {
+        const element = document.createElement('div');
+        element.className = 'pair-emoji';
+        element.dataset.emoji = emoji;
+        element.textContent = emoji;
+        element.style.left = `${(x / aspect) * 100}%`;
+        element.style.top = `${y * 100}%`;
+        element.style.width = element.style.height = `${size * frameHeight}px`;
+        element.style.fontSize = `${size * frameHeight * 0.8}px`;
+        element.style.setProperty('--angle', `${angle}deg`);
+        element.addEventListener('pointerdown', () => tapPairEmoji(index, emoji));
+        return element;
+      }),
+    );
+  });
+}
+
+function startPairRound() {
+  clearPair();
+  pair.round = pickPairRound();
+  pair.lockedUntil = [0, 0];
+  for (const side of pairSides) side.classList.remove('locked');
+  pair.active = true;
+  showFigure('pair', '#000000');
+  layoutPair();
+  // Se ninguém achar o par a tempo, a rodada é descartada e refeita.
+  at(performance.now() + pair.seconds * 1000, startPairRound);
+}
+
+function startPairMatch(settings) {
+  pair.scores = [0, 0];
+  pair.target = (settings.bestOf + 1) / 2;
+  pair.seconds = settings.pairSeconds;
+  pairAgain.hidden = true;
+  renderPairScore();
+  startPairRound();
+}
+
+function tapPairEmoji(player, emoji) {
+  const now = performance.now();
+  if (!pair.active || now < pair.lockedUntil[player]) return;
+  if (emoji !== pair.round.common) {
+    pair.lockedUntil[player] = now + PAIR_LOCK_MS;
+    pairSides[player].classList.add('locked');
+    pair.timers.push(setTimeout(() => pairSides[player].classList.remove('locked'), PAIR_LOCK_MS));
+    beepWrong();
+    return;
+  }
+  clearPair();
+  pair.scores[player]++;
+  renderPairScore();
+  beepRight();
+  for (const frame of pairFrames) {
+    for (const element of frame.children) {
+      if (element.dataset.emoji === emoji) element.classList.add('found');
+    }
+  }
+  at(now + PAIR_FOUND_MS, () => {
+    if (pair.scores[player] >= pair.target) finishPairMatch(player);
+    else startPairRound();
+  });
+}
+
+function finishPairMatch(winner) {
+  pairFrames.forEach((frame, index) => {
+    const message = document.createElement('p');
+    message.className = 'pair-message';
+    message.textContent = index === winner ? 'Você ganhou! 🎉' : 'Você perdeu';
+    frame.replaceChildren(message);
+  });
+  pairAgain.hidden = false;
+  beepStart();
+}
+
+pairAgain.addEventListener('click', () => startRound(currentSettings));
+window.addEventListener('resize', () => {
+  if (game.dataset.figure === 'pair' && pair.active) layoutPair();
+});
 
 let lastFigure;
 let round;
@@ -463,7 +613,7 @@ function enterFullscreen() {
 let currentSettings;
 
 function startRound(settings) {
-  clearTimeout(timer);
+  clearPair();
   lastFigure = undefined;
   round = undefined;
   roundIndex = 0;
@@ -487,7 +637,7 @@ function startGame(settings) {
 
 function stopGame() {
   if (game.hidden) return;
-  clearTimeout(timer);
+  clearPair();
   cancelHold();
   showFigure('flash');
   game.hidden = true;
@@ -512,7 +662,7 @@ function cancelHold() {
 
 function completeHold() {
   holdCompleted = true;
-  clearTimeout(timer);
+  clearPair();
   showFigure('flash');
 }
 
@@ -525,6 +675,8 @@ function releasePointer(event) {
 }
 
 game.addEventListener('pointerdown', (event) => {
+  // No Encontre o par os toques são dos jogadores; só o placar central encerra o jogo.
+  if (game.dataset.figure === 'pair' && !event.target.closest('#pair-score')) return;
   pressedPointers.add(event.pointerId);
   if (pressedPointers.size > 1) return;
   game.classList.add('holding');
