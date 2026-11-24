@@ -593,14 +593,6 @@ input[type='range'] {
   transform: translate(-50%, -50%) rotate(var(--turn));
 }
 
-#pair-left .pair-frame {
-  --turn: 90deg;
-}
-
-#pair-right .pair-frame {
-  --turn: -90deg;
-}
-
 .pair-emoji {
   position: absolute;
   display: grid;
@@ -673,20 +665,39 @@ input[type='range'] {
   font-weight: 600;
 }
 
-#pair-rotate {
-  display: none;
-  position: absolute;
-  z-index: 3;
-  inset: 0;
-  margin: 0;
-  place-items: center;
-  background: #000;
-  font-size: 1.5rem;
-  text-align: center;
-}
-
+/* Aparelho em pé sobre a mesa: os jogadores ficam nas pontas de cima e de baixo. */
 @media (orientation: portrait) {
-  #pair-rotate {
-    display: grid;
+  #pair::before {
+    top: calc(50% - 2px);
+    bottom: auto;
+    left: 0;
+    width: auto;
+    right: 0;
+    height: 4px;
+  }
+
+  .pair-side {
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 50%;
+  }
+
+  #pair-left {
+    top: 0;
+    bottom: auto;
+  }
+
+  #pair-right {
+    top: auto;
+    bottom: 0;
+  }
+
+  #score-left {
+    transform: rotate(180deg);
+  }
+
+  #score-right {
+    transform: none;
   }
 }

@@ -476,15 +476,26 @@ function renderPairScore() {
 }
 
 // Cada metade é um quadro girado para ficar de frente para o jogador da ponta.
-function layoutPair() {
+// Deitado, os jogadores ficam à esquerda e à direita; em pé, em cima e embaixo.
+function placePairFrames() {
   const { clientWidth: width, clientHeight: height } = game;
-  const frameHeight = Math.max(1, width / 2 - PAIR_CENTER_BAND);
-  const aspect = height / frameHeight;
+  const landscape = width >= height;
+  const frameHeight = Math.max(1, (landscape ? width : height) / 2 - PAIR_CENTER_BAND);
+  const frameWidth = landscape ? height : width;
   pairFrames.forEach((frame, index) => {
-    frame.style.width = `${height}px`;
+    const along = (index === 0 ? 0 : PAIR_CENTER_BAND) + frameHeight / 2;
+    frame.style.width = `${frameWidth}px`;
     frame.style.height = `${frameHeight}px`;
-    frame.style.top = `${height / 2}px`;
-    frame.style.left = `${(index === 0 ? 0 : PAIR_CENTER_BAND) + frameHeight / 2}px`;
+    frame.style.left = `${landscape ? along : frameWidth / 2}px`;
+    frame.style.top = `${landscape ? frameWidth / 2 : along}px`;
+    frame.style.setProperty('--turn', `${landscape ? (index === 0 ? 90 : -90) : index === 0 ? 180 : 0}deg`);
+  });
+  return { aspect: frameWidth / frameHeight, frameHeight };
+}
+
+function layoutPair() {
+  const { aspect, frameHeight } = placePairFrames();
+  pairFrames.forEach((frame, index) => {
     const items = layoutPairEmojis(pair.round.sides[index], aspect);
     frame.replaceChildren(
       ...items.map(({ emoji, x, y, size, angle }) => {
@@ -563,7 +574,9 @@ function finishPairMatch(winner) {
 
 pairAgain.addEventListener('click', () => startRound(currentSettings));
 window.addEventListener('resize', () => {
-  if (game.dataset.figure === 'pair' && pair.active) layoutPair();
+  if (game.dataset.figure !== 'pair') return;
+  if (pair.active) layoutPair();
+  else placePairFrames();
 });
 
 let lastFigure;
